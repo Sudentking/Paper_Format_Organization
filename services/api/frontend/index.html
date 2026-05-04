@@ -197,6 +197,30 @@
             box-shadow: 0 0 0 2px rgba(26,115,232,0.15);
         }
 
+        .config-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            flex-wrap: wrap;
+        }
+
+        .config-row:last-child { border-bottom: none; }
+
+        .config-row-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a73e8;
+            min-width: 80px;
+            flex-shrink: 0;
+        }
+
+        .config-row .config-item {
+            flex: 1;
+            min-width: 120px;
+        }
+
         .btn-row {
             display: flex;
             gap: 12px;
@@ -422,103 +446,135 @@
                     <div class="config-section-title" data-target="headingConfig">
                         标题格式 <span class="arrow">▼</span>
                     </div>
-                    <div class="config-grid" id="headingConfig">
-                        <div class="config-item">
-                            <label>一级标题字体</label>
-                            <select id="h1_font_cn">
-                                <option value="黑体">黑体</option>
-                                <option value="宋体">宋体</option>
-                                <option value="楷体">楷体</option>
-                                <option value="仿宋">仿宋</option>
-                            </select>
+                    <div id="headingConfig">
+                        <div class="config-row">
+                            <span class="config-row-label">一级标题</span>
+                            <div class="config-item">
+                                <label>字体</label>
+                                <select id="h1_font_cn">
+                                    <option value="黑体">黑体</option>
+                                    <option value="宋体">宋体</option>
+                                    <option value="楷体">楷体</option>
+                                    <option value="仿宋">仿宋</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <label>字号</label>
+                                <select id="h1_size">
+                                    <option value="10.5">五号 (10.5pt)</option>
+                                    <option value="12">小四 (12pt)</option>
+                                    <option value="14" selected>四号 (14pt)</option>
+                                    <option value="15">小三 (15pt)</option>
+                                    <option value="16">三号 (16pt)</option>
+                                    <option value="18">小二 (18pt)</option>
+                                    <option value="22">二号 (22pt)</option>
+                                    <option value="24">小一 (24pt)</option>
+                                    <option value="26">一号 (26pt)</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <label>对齐</label>
+                                <select id="h1_alignment">
+                                    <option value="left">左对齐</option>
+                                    <option value="center">居中</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <label>行距</label>
+                                <select id="h1_line_spacing">
+                                    <option value="1.0">1.0 倍</option>
+                                    <option value="1.25">1.25 倍</option>
+                                    <option value="1.5">1.5 倍</option>
+                                    <option value="1.75">1.75 倍</option>
+                                    <option value="2.0">2.0 倍</option>
+                                    <option value="2.5">2.5 倍</option>
+                                    <option value="3.0">3.0 倍</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="config-item">
-                            <label>一级标题字号</label>
-                            <select id="h1_size">
-                                <option value="14">四号 (14pt)</option>
-                                <option value="16">三号 (16pt)</option>
-                                <option value="18">小二 (18pt)</option>
-                                <option value="22">二号 (22pt)</option>
-                            </select>
+                        <div class="config-row">
+                            <span class="config-row-label">二级标题</span>
+                            <div class="config-item">
+                                <label>字体</label>
+                                <select id="h2_font_cn">
+                                    <option value="黑体">黑体</option>
+                                    <option value="宋体">宋体</option>
+                                    <option value="楷体">楷体</option>
+                                    <option value="仿宋">仿宋</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <label>字号</label>
+                                <select id="h2_size">
+                                    <option value="10.5">五号 (10.5pt)</option>
+                                    <option value="12" selected>小四 (12pt)</option>
+                                    <option value="14">四号 (14pt)</option>
+                                    <option value="15">小三 (15pt)</option>
+                                    <option value="16">三号 (16pt)</option>
+                                    <option value="18">小二 (18pt)</option>
+                                    <option value="22">二号 (22pt)</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <label>对齐</label>
+                                <select id="h2_alignment">
+                                    <option value="left">左对齐</option>
+                                    <option value="center">居中</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <label>行距</label>
+                                <select id="h2_line_spacing">
+                                    <option value="1.0">1.0 倍</option>
+                                    <option value="1.25">1.25 倍</option>
+                                    <option value="1.5">1.5 倍</option>
+                                    <option value="1.75">1.75 倍</option>
+                                    <option value="2.0">2.0 倍</option>
+                                    <option value="2.5">2.5 倍</option>
+                                    <option value="3.0">3.0 倍</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="config-item">
-                            <label>二级标题字体</label>
-                            <select id="h2_font_cn">
-                                <option value="黑体">黑体</option>
-                                <option value="宋体">宋体</option>
-                                <option value="楷体">楷体</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>二级标题字号</label>
-                            <select id="h2_size">
-                                <option value="12">小四 (12pt)</option>
-                                <option value="14">四号 (14pt)</option>
-                                <option value="16">三号 (16pt)</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>三级标题字体</label>
-                            <select id="h3_font_cn">
-                                <option value="宋体">宋体</option>
-                                <option value="黑体">黑体</option>
-                                <option value="楷体">楷体</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>三级标题字号</label>
-                            <select id="h3_size">
-                                <option value="12">小四 (12pt)</option>
-                                <option value="14">四号 (14pt)</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>一级标题对齐</label>
-                            <select id="h1_alignment">
-                                <option value="left">左对齐</option>
-                                <option value="center">居中</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>二级标题对齐</label>
-                            <select id="h2_alignment">
-                                <option value="left">左对齐</option>
-                                <option value="center">居中</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>三级标题对齐</label>
-                            <select id="h3_alignment">
-                                <option value="left">左对齐</option>
-                                <option value="center">居中</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>一级标题行距</label>
-                            <select id="h1_line_spacing">
-                                <option value="1.0">1.0 倍</option>
-                                <option value="1.25">1.25 倍</option>
-                                <option value="1.5">1.5 倍</option>
-                                <option value="2.0">2.0 倍</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>二级标题行距</label>
-                            <select id="h2_line_spacing">
-                                <option value="1.0">1.0 倍</option>
-                                <option value="1.25">1.25 倍</option>
-                                <option value="1.5">1.5 倍</option>
-                                <option value="2.0">2.0 倍</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>三级标题行距</label>
-                            <select id="h3_line_spacing">
-                                <option value="1.0">1.0 倍</option>
-                                <option value="1.25">1.25 倍</option>
-                                <option value="1.5">1.5 倍</option>
-                                <option value="2.0">2.0 倍</option>
-                            </select>
+                        <div class="config-row">
+                            <span class="config-row-label">三级标题</span>
+                            <div class="config-item">
+                                <label>字体</label>
+                                <select id="h3_font_cn">
+                                    <option value="宋体">宋体</option>
+                                    <option value="黑体">黑体</option>
+                                    <option value="楷体">楷体</option>
+                                    <option value="仿宋">仿宋</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <label>字号</label>
+                                <select id="h3_size">
+                                    <option value="10.5">五号 (10.5pt)</option>
+                                    <option value="12" selected>小四 (12pt)</option>
+                                    <option value="14">四号 (14pt)</option>
+                                    <option value="15">小三 (15pt)</option>
+                                    <option value="16">三号 (16pt)</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <label>对齐</label>
+                                <select id="h3_alignment">
+                                    <option value="left">左对齐</option>
+                                    <option value="center">居中</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <label>行距</label>
+                                <select id="h3_line_spacing">
+                                    <option value="1.0">1.0 倍</option>
+                                    <option value="1.25">1.25 倍</option>
+                                    <option value="1.5">1.5 倍</option>
+                                    <option value="1.75">1.75 倍</option>
+                                    <option value="2.0">2.0 倍</option>
+                                    <option value="2.5">2.5 倍</option>
+                                    <option value="3.0">3.0 倍</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -540,9 +596,12 @@
                         <div class="config-item">
                             <label>正文字号</label>
                             <select id="body_size">
-                                <option value="12">小四 (12pt)</option>
+                                <option value="9">小五 (9pt)</option>
                                 <option value="10.5">五号 (10.5pt)</option>
+                                <option value="12" selected>小四 (12pt)</option>
                                 <option value="14">四号 (14pt)</option>
+                                <option value="15">小三 (15pt)</option>
+                                <option value="16">三号 (16pt)</option>
                             </select>
                         </div>
                         <div class="config-item">
@@ -551,7 +610,10 @@
                                 <option value="1.0">1.0 倍</option>
                                 <option value="1.25">1.25 倍</option>
                                 <option value="1.5" selected>1.5 倍</option>
+                                <option value="1.75">1.75 倍</option>
                                 <option value="2.0">2.0 倍</option>
+                                <option value="2.5">2.5 倍</option>
+                                <option value="3.0">3.0 倍</option>
                             </select>
                         </div>
                         <div class="config-item">
@@ -581,22 +643,28 @@
                         <div class="config-item">
                             <label>表标题字号</label>
                             <select id="table_caption_size">
-                                <option value="12">小四 (12pt)</option>
+                                <option value="9">小五 (9pt)</option>
                                 <option value="10.5">五号 (10.5pt)</option>
+                                <option value="12" selected>小四 (12pt)</option>
+                                <option value="14">四号 (14pt)</option>
                             </select>
                         </div>
                         <div class="config-item">
                             <label>表格内容字号</label>
                             <select id="table_content_size">
+                                <option value="9">小五 (9pt)</option>
+                                <option value="10.5" selected>五号 (10.5pt)</option>
                                 <option value="12">小四 (12pt)</option>
-                                <option value="10.5">五号 (10.5pt)</option>
+                                <option value="14">四号 (14pt)</option>
                             </select>
                         </div>
                         <div class="config-item">
                             <label>图标题字号</label>
                             <select id="figure_caption_size">
-                                <option value="12">小四 (12pt)</option>
+                                <option value="9">小五 (9pt)</option>
                                 <option value="10.5">五号 (10.5pt)</option>
+                                <option value="12" selected>小四 (12pt)</option>
+                                <option value="14">四号 (14pt)</option>
                             </select>
                         </div>
                         <div class="config-item">
@@ -631,8 +699,11 @@
                         <div class="config-item">
                             <label>章标题字号</label>
                             <select id="toc_chapter_size">
-                                <option value="12">小四 (12pt)</option>
+                                <option value="10.5">五号 (10.5pt)</option>
+                                <option value="12" selected>小四 (12pt)</option>
                                 <option value="14">四号 (14pt)</option>
+                                <option value="15">小三 (15pt)</option>
+                                <option value="16">三号 (16pt)</option>
                             </select>
                         </div>
                         <div class="config-item">
@@ -645,8 +716,11 @@
                         <div class="config-item">
                             <label>节标题字号</label>
                             <select id="toc_section_size">
-                                <option value="12">小四 (12pt)</option>
+                                <option value="10.5">五号 (10.5pt)</option>
+                                <option value="12" selected>小四 (12pt)</option>
                                 <option value="14">四号 (14pt)</option>
+                                <option value="15">小三 (15pt)</option>
+                                <option value="16">三号 (16pt)</option>
                             </select>
                         </div>
                         <div class="config-item">
@@ -655,6 +729,7 @@
                                 <option value="1.0">1.0 倍</option>
                                 <option value="1.25" selected>1.25 倍</option>
                                 <option value="1.5">1.5 倍</option>
+                                <option value="1.75">1.75 倍</option>
                                 <option value="2.0">2.0 倍</option>
                             </select>
                         </div>

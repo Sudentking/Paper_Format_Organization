@@ -145,6 +145,17 @@ class TOCFormatter(BaseFormatter):
             if ind is not None:
                 ind.set(qn('w:left'), '0')
 
+        tabs = pPr.find(qn('w:tabs'))
+        if tabs is not None:
+            pPr.remove(tabs)
+        tabs = OxmlElement('w:tabs')
+        tab = OxmlElement('w:tab')
+        tab.set(qn('w:val'), 'right')
+        tab.set(qn('w:leader'), 'dot')
+        tab.set(qn('w:pos'), '8296')
+        tabs.append(tab)
+        pPr.append(tabs)
+
         m = TRAILING_NUM_PATTERN.match(text.strip())
         if m:
             title_part = m.group(1)
@@ -161,6 +172,7 @@ class TOCFormatter(BaseFormatter):
         self._clear_runs(p_elem)
         self._add_sdt_runs(p_elem, title_part, cn_font, en_font, font_size, is_bold)
         if page_part:
+            self._add_tab_run(p_elem)
             self._add_sdt_runs(p_elem, page_part, cn_font, en_font, font_size, False)
 
     def _format_paragraph_toc(self):
@@ -270,6 +282,12 @@ class TOCFormatter(BaseFormatter):
         if not text.strip():
             return
         title_part, trailing_part = split_toc_parts(text)
+
+        m_trail = TRAILING_NUM_PATTERN.match(title_part.strip())
+        if m_trail and not trailing_part:
+            title_part = m_trail.group(1)
+            trailing_part = m_trail.group(2)
+
         entry_type, _ = self._detect_entry_type(title_part)
 
         if entry_type == 'chapter':
@@ -292,6 +310,10 @@ class TOCFormatter(BaseFormatter):
         else:
             paragraph.paragraph_format.left_indent = None
 
+        from docx.shared import Cm
+        tab_stops = paragraph.paragraph_format.tab_stops
+        tab_stops.add_tab_stop(Cm(14.65), alignment=2, leader=1)
+
         cn_font = cfg.get('font_name_cn', '宋体')
         en_font = cfg.get('font_name_en', 'Times New Roman')
         font_size = cfg.get('font_size', 12)
@@ -300,6 +322,7 @@ class TOCFormatter(BaseFormatter):
         paragraph.clear()
         self._add_para_runs(paragraph, title_part, cn_font, en_font, font_size, is_bold)
         if trailing_part:
+            paragraph.add_run('\t')
             self._add_para_runs(paragraph, trailing_part, cn_font, en_font, font_size, False)
 
     def _add_para_runs(self, paragraph, text, cn_font, en_font, font_size, bold):
@@ -342,6 +365,13 @@ class TOCFormatter(BaseFormatter):
             r_elem.append(t_elem)
 
             p_elem.append(r_elem)
+
+    @staticmethod
+    def _add_tab_run(p_elem):
+        r_elem = OxmlElement('w:r')
+        t_elem = OxmlElement('w:tab')
+        r_elem.append(t_elem)
+        p_elem.append(r_elem)
 
     def _clear_runs(self, p_elem):
         for r in p_elem.findall(qn('w:r')):
