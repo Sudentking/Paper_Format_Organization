@@ -54,3 +54,4 @@ uploads/
 .DS_Store
 Thumbs.db
 *.tmp
+*.docx
