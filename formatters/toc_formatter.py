@@ -7,18 +7,36 @@ from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 import re
 
+TAB_PAGE_PATTERN = re.compile(r'^(.+?)\t(\S+)$')
+DOTS_PAGE_PATTERN = re.compile(r'^(.+?)(\s*\.{2,}\s*\S+)$')
+CHAPTER_NUM_PATTERN = re.compile(r'^(\d+(?:\.\d+)*)\s+')
+TOC_STYLE_PATTERN = re.compile(r'^TOC\s+\d+$', re.IGNORECASE)
 
-CHAPTER_PATTERN = re.compile(
-    r'^(\d+(?:\.\d+)*)(\s+)(.+?)(\s*\.{2,}\s*\S+)$'
-)
 
-SPECIAL_ENTRY_PATTERN = re.compile(
-    r'^(摘要|Abstract|结论|参考文献|致谢)(\s*\.{2,}\s*\S+)$'
-)
+def is_toc_entry(text):
+    text = text.strip()
+    if '\t' in text and TAB_PAGE_PATTERN.match(text):
+        return True
+    if DOTS_PAGE_PATTERN.search(text):
+        return True
+    return False
 
-TOC_LINE_PATTERN = re.compile(
-    r'^(.+?)(\s*\.{2,}\s*\S+)$'
-)
+
+def is_toc_style(style_name):
+    if not style_name:
+        return False
+    return bool(TOC_STYLE_PATTERN.match(style_name))
+
+
+def split_toc_parts(text):
+    text = text.strip()
+    m = TAB_PAGE_PATTERN.match(text)
+    if m:
+        return m.group(1), '\t' + m.group(2)
+    m = DOTS_PAGE_PATTERN.match(text)
+    if m:
+        return m.group(1), m.group(2)
+    return text, ''
 
 
 class TOCFormatter(BaseFormatter):
@@ -70,22 +88,29 @@ class TOCFormatter(BaseFormatter):
 
     def _format_toc_entries(self):
         in_toc = False
+        toc_found = False
 
         for paragraph in self.doc.paragraphs:
+            text = paragraph.text.strip()
             style_name = paragraph.style.name if paragraph.style else ''
 
             if self._is_toc_title(paragraph):
                 in_toc = True
+                toc_found = True
                 continue
 
             if not in_toc:
+                if is_toc_style(style_name):
+                    in_toc = True
+                    toc_found = True
+                else:
+                    continue
+
+            if not text:
                 continue
 
             if self._is_toc_end(paragraph, style_name):
                 break
-
-            if not paragraph.text.strip():
-                continue
 
             self._format_entry(paragraph)
 
@@ -93,7 +118,7 @@ class TOCFormatter(BaseFormatter):
         text = paragraph.text.strip()
         style_name = paragraph.style.name if paragraph.style else ''
 
-        if 'TOC' in style_name or 'toc' in style_name.lower():
+        if style_name in ('TOC Heading', 'toc heading'):
             return True
 
         if re.match(r'^目\s*录$', text):
@@ -104,42 +129,59 @@ class TOCFormatter(BaseFormatter):
     def _is_toc_end(self, paragraph, style_name):
         text = paragraph.text.strip()
 
-        if match_pattern(text, self.heading_patterns.get('level1', '')):
-            return True
+        if not text:
+            return False
 
-        if text and 'TOC' not in style_name and 'toc' not in style_name.lower():
-            if match_pattern(text, self.recognition_config.get('reference_title_pattern', '')):
+        if is_toc_entry(text):
+            return False
+
+        if is_toc_style(style_name):
+            return False
+
+        if style_name in ('TOC Heading', 'toc heading'):
+            return False
+
+        text_only = split_toc_parts(text)[0].strip()
+        if CHAPTER_NUM_PATTERN.match(text_only):
+            if '\t' not in text and not re.search(r'\.{2,}', text):
                 return True
+
+        if match_pattern(text, self.recognition_config.get('reference_title_pattern', '')):
+            return True
 
         return False
 
-    def _detect_entry_type(self, text):
-        text = text.strip()
+    def _detect_entry_type(self, title_part):
+        title_part = title_part.strip()
 
         for entry_name in self.special_entries:
-            if text.startswith(entry_name):
-                after = text[len(entry_name):]
+            if title_part == entry_name:
+                return 'special', entry_name
+            if title_part.startswith(entry_name):
+                after = title_part[len(entry_name):]
                 if not after or after[0] in ' \t.':
                     return 'special', entry_name
 
-        m = CHAPTER_PATTERN.match(text)
+        m = CHAPTER_NUM_PATTERN.match(title_part)
         if m:
-            depth = m.group(1).count('.')
+            num_part = m.group(1)
+            depth = num_part.count('.')
             if depth == 0:
-                return 'chapter', m.group(3)
+                return 'chapter', title_part[m.end():]
             elif depth == 1:
-                return 'section', m.group(3)
+                return 'section', title_part[m.end():]
             else:
-                return 'subsection', m.group(3)
+                return 'subsection', title_part[m.end():]
 
-        return 'unknown', text
+        return 'unknown', title_part
 
     def _format_entry(self, paragraph):
         text = paragraph.text
         if not text.strip():
             return
 
-        entry_type, _ = self._detect_entry_type(text)
+        title_part, trailing_part = split_toc_parts(text)
+        entry_type, _ = self._detect_entry_type(title_part)
 
         if entry_type == 'chapter':
             cfg = self.chapter_config
@@ -167,21 +209,13 @@ class TOCFormatter(BaseFormatter):
         else:
             paragraph.paragraph_format.left_indent = None
 
-        self._format_entry_runs(paragraph, text, cfg, entry_type)
+        self._format_entry_runs(paragraph, title_part, trailing_part, cfg, entry_type)
 
-    def _format_entry_runs(self, paragraph, text, cfg, entry_type):
+    def _format_entry_runs(self, paragraph, title_part, trailing_part, cfg, entry_type):
         cn_font = cfg.get('font_name_cn', '宋体')
         en_font = cfg.get('font_name_en', 'Times New Roman')
         font_size = cfg.get('font_size', 12)
-        is_bold = cfg.get('bold', False) if entry_type != 'chapter' else True
-
-        m = TOC_LINE_PATTERN.match(text)
-        if m:
-            title_part = m.group(1)
-            trailing_part = m.group(2)
-        else:
-            title_part = text
-            trailing_part = ''
+        is_bold = True if entry_type == 'chapter' else cfg.get('bold', False)
 
         paragraph.clear()
 

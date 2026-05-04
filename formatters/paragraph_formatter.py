@@ -1,10 +1,8 @@
-import re
 from .base_formatter import BaseFormatter
+from .toc_formatter import is_toc_entry, is_toc_style
 from utils.docx_helper import (
     set_paragraph_format, format_paragraph_text, detect_heading_level, match_pattern,
 )
-
-TOC_DOTS_PATTERN = re.compile(r'\.{2,}\s*\S+\s*$')
 
 
 class ParagraphFormatter(BaseFormatter):
@@ -27,7 +25,8 @@ class ParagraphFormatter(BaseFormatter):
         if not text.strip():
             return True
 
-        if TOC_DOTS_PATTERN.search(text):
+        style_name = paragraph.style.name if paragraph.style else ''
+        if is_toc_entry(text) or is_toc_style(style_name):
             return True
 
         if detect_heading_level(paragraph, self.heading_patterns):
