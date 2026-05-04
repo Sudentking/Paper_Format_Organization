@@ -397,6 +397,97 @@
             .config-grid { grid-template-columns: 1fr; }
             .upload-zone { padding: 32px 16px; }
         }
+
+        .preview-header {
+            background: linear-gradient(135deg, #1a73e8, #0d47a1);
+            color: white;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .preview-header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .preview-header .btn {
+            font-size: 13px;
+            padding: 8px 16px;
+        }
+
+        .preview-header .preview-back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .preview-header .preview-back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .preview-header .preview-download-btn {
+            background: #4caf50;
+            color: white;
+            border: none;
+            text-decoration: none;
+        }
+
+        .preview-header .preview-download-btn:hover {
+            background: #388e3c;
+        }
+
+        .preview-hint {
+            background: #fff3cd;
+            border-bottom: 1px solid #ffc107;
+            padding: 10px 32px;
+            font-size: 13px;
+            color: #856404;
+            text-align: center;
+        }
+
+        .preview-frame-wrapper {
+            background: #e8e8e8;
+            padding: 24px;
+            min-height: calc(100vh - 200px);
+            display: flex;
+            justify-content: center;
+        }
+
+        .preview-frame {
+            width: 210mm;
+            max-width: 100%;
+            min-height: calc(100vh - 250px);
+            background: white;
+            border: none;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+            border-radius: 2px;
+        }
+
+        .preview-footer {
+            background: white;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #e0e0e0;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+            position: sticky;
+            bottom: 0;
+        }
+
+        .preview-footer .btn-primary {
+            background: #4caf50;
+        }
+
+        .preview-footer .btn-primary:hover {
+            background: #388e3c;
+        }
     </style>
 </head>
 <body>
@@ -405,7 +496,7 @@
         <p>拖入文档，调整格式，一键处理 — 无需注册，即开即用</p>
     </div>
 
-    <div class="container">
+    <div class="container" id="mainContent">
         <div class="card">
             <div class="card-title">
                 <span class="step">1</span>
@@ -745,7 +836,7 @@
             </div>
             <div class="btn-row">
                 <button class="btn btn-primary" id="formatBtn" disabled>
-                    <span id="formatBtnText">开始格式化</span>
+                    <span id="formatBtnText">确认修改</span>
                 </button>
                 <button class="btn btn-secondary" id="resetBtn">重置设置</button>
             </div>
@@ -761,11 +852,38 @@
         </div>
     </div>
 
+    <div id="previewPage" style="display:none;">
+        <div class="preview-header">
+            <div class="preview-header-left">
+                <button class="btn btn-secondary preview-back-btn" id="previewBackBtn">← 返回修改</button>
+            </div>
+            <div class="preview-header-title">文档预览</div>
+            <div class="preview-header-right">
+                <a class="btn btn-primary preview-download-btn" id="previewDownloadBtn" href="#" download>
+                    📥 确认下载文档
+                </a>
+            </div>
+        </div>
+        <div class="preview-hint">
+            ⚠️ 预览为 HTML 渲染效果，可能与最终 Word 文档存在细微差异（字体、分页、页眉页脚等）。确认无误后请点击右上角下载。
+        </div>
+        <div class="preview-frame-wrapper">
+            <iframe id="previewFrame" class="preview-frame" src="about:blank"></iframe>
+        </div>
+        <div class="preview-footer">
+            <button class="btn btn-secondary" id="previewBackBtnBottom">← 返回修改设置</button>
+            <a class="btn btn-primary" id="previewDownloadBtnBottom" href="#" download>
+                📥 确认下载格式化文档
+            </a>
+        </div>
+    </div>
+
     <script>
         const state = {
             file: null,
             sessionId: null,
             filename: null,
+            outputFilename: null,
             isProcessing: false
         };
 
@@ -1057,7 +1175,6 @@
                     <div class="result-success">
                         <div class="result-title">✅ 处理完成</div>
                         <div class="result-detail">${message}</div>
-                        <a class="download-btn" href="${downloadUrl}" download>📥 下载格式化文档</a>
                     </div>
                 `;
             } else {
@@ -1068,6 +1185,43 @@
                     </div>
                 `;
             }
+        }
+
+        function showPreview(sessionId, outputFilename) {
+            const mainContent = document.getElementById('mainContent');
+            const header = document.querySelector('.header');
+            const previewPage = document.getElementById('previewPage');
+            const previewFrame = document.getElementById('previewFrame');
+            const previewDownloadBtn = document.getElementById('previewDownloadBtn');
+            const previewDownloadBtnBottom = document.getElementById('previewDownloadBtnBottom');
+
+            const downloadUrl = `/api/download/${sessionId}/${outputFilename}`;
+            previewDownloadBtn.href = downloadUrl;
+            previewDownloadBtnBottom.href = downloadUrl;
+
+            header.style.display = 'none';
+            mainContent.style.display = 'none';
+            previewPage.style.display = '';
+
+            const previewUrl = `/api/preview/${sessionId}/${outputFilename}`;
+            previewFrame.src = previewUrl;
+        }
+
+        function hidePreview() {
+            const mainContent = document.getElementById('mainContent');
+            const header = document.querySelector('.header');
+            const previewPage = document.getElementById('previewPage');
+            const previewFrame = document.getElementById('previewFrame');
+
+            previewPage.style.display = 'none';
+            header.style.display = '';
+            mainContent.style.display = '';
+            previewFrame.src = 'about:blank';
+
+            progressArea.classList.remove('show');
+            resultArea.classList.remove('show');
+
+            state.outputFilename = null;
         }
 
         async function uploadFile(file) {
@@ -1109,10 +1263,10 @@
                 const formatResult = await formatDocument(state.sessionId, state.filename, configJSON);
 
                 if (formatResult.success) {
-                    const downloadUrl = `/api/download/${formatResult.session_id}/${formatResult.output_filename}`;
-                    setProgress(100, '处理完成！');
+                    state.outputFilename = formatResult.output_filename;
+                    setProgress(100, '处理完成！正在加载预览...');
                     setTimeout(() => {
-                        showResult(true, formatResult.message, downloadUrl);
+                        showPreview(formatResult.session_id, formatResult.output_filename);
                     }, 300);
                 } else {
                     showResult(false, formatResult.message || '格式化失败');
@@ -1122,9 +1276,12 @@
             } finally {
                 state.isProcessing = false;
                 formatBtn.disabled = false;
-                formatBtnText.textContent = '开始格式化';
+                formatBtnText.textContent = '确认修改';
             }
         });
+
+        document.getElementById('previewBackBtn').addEventListener('click', hidePreview);
+        document.getElementById('previewBackBtnBottom').addEventListener('click', hidePreview);
 
         document.addEventListener('dragover', (e) => e.preventDefault());
         document.addEventListener('drop', (e) => e.preventDefault());

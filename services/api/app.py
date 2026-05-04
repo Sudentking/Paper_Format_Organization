@@ -267,6 +267,36 @@ async def guest_format(
         }, status_code=500)
 
 
+@app.get("/api/preview/{session_id}/{filename}", response_class=HTMLResponse, tags=["前端接口"])
+async def guest_preview(session_id: str, filename: str):
+    file_path = os.path.join(GUEST_DIR, session_id, filename)
+
+    if not os.path.exists(file_path):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="文件不存在"
+        )
+
+    try:
+        sys_path_backup = os.sys.path.copy()
+        project_root = str(Path(__file__).parent.parent.parent)
+        if project_root not in os.sys.path:
+            os.sys.path.insert(0, project_root)
+
+        from services.doc_preview import convert_docx_to_html
+
+        if project_root in os.sys.path:
+            os.sys.path.remove(project_root)
+
+        html_content = convert_docx_to_html(file_path)
+        return HTMLResponse(content=html_content)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"预览生成失败: {str(e)}"
+        )
+
+
 @app.get("/api/download/{session_id}/{filename}", tags=["前端接口"])
 async def guest_download(session_id: str, filename: str):
     file_path = os.path.join(GUEST_DIR, session_id, filename)
