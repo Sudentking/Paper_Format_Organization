@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word 文档格式化工具</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a73e8, #0d47a1);
+            color: white;
+            padding: 24px 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .header h1 { font-size: 24px; font-weight: 600; }
+        .header p { font-size: 14px; opacity: 0.85; margin-top: 4px; }
+
+        .container {
+            max-width: 960px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title .step {
+            background: #1a73e8;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .upload-zone {
+            border: 2px dashed #c4c9d4;
+            border-radius: 12px;
+            padding: 48px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s;
+            background: #fafbfc;
+            position: relative;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: #1a73e8;
+            background: #e8f0fe;
+        }
+
+        .upload-zone.dragover {
+            transform: scale(1.01);
+        }
+
+        .upload-zone .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .upload-zone .main-text {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .upload-zone .sub-text {
+            font-size: 13px;
+            color: #888;
+            margin-top: 6px;
+        }
+
+        .upload-zone input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-info {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .file-info.show { display: flex; }
+
+        .file-info .file-icon { font-size: 28px; }
+        .file-info .file-name { font-weight: 500; font-size: 14px; }
+        .file-info .file-size { font-size: 12px; color: #666; }
+        .file-info .remove-btn {
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #999;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .file-info .remove-btn:hover { background: #f5f5f5; color: #333; }
+
+        .config-section { margin-bottom: 16px; }
+
+        .config-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .config-section-title:hover { color: #1a73e8; }
+
+        .config-section-title .arrow {
+            transition: transform 0.2s;
+            font-size: 12px;
+        }
+
+        .config-section-title .arrow.collapsed { transform: rotate(-90deg); }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .config-grid.collapsed { display: none; }
+
+        .config-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .config-item label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .config-item select,
+        .config-item input[type="number"] {
+            padding: 6px 10px;
+            border: 1px solid #d9dce3;
+            border-radius: 6px;
+            font-size: 13px;
+            background: white;
+            transition: border-color 0.2s;
+        }
+
+        .config-item select:focus,
+        .config-item input[type="number"]:focus {
+            outline: none;
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px rgba(26,115,232,0.15);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: #1a73e8;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #1557b0;
+            box-shadow: 0 2px 8px rgba(26,115,232,0.3);
+        }
+
+        .btn-secondary {
+            background: #f1f3f4;
+            color: #333;
+        }
+
+        .btn-secondary:hover:not(:disabled) { background: #e2e5e8; }
+
+        .progress-area {
+            display: none;
+            margin-top: 16px;
+        }
+
+        .progress-area.show { display: block; }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: #e8e8e8;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #1a73e8, #4caf50);
+            border-radius: 3px;
+            transition: width 0.3s;
+            width: 0%;
+        }
+
+        .progress-bar.indeterminate {
+            width: 30%;
+            animation: slide 1.2s ease-in-out infinite;
+        }
+
+        @keyframes slide {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(400%); }
+        }
+
+        .progress-text {
+            font-size: 13px;
+            color: #666;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .result-area {
+            display: none;
+            margin-top: 16px;
+        }
+
+        .result-area.show { display: block; }
+
+        .result-success {
+            padding: 16px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .result-error {
+            padding: 16px;
+            background: #fce4ec;
+            border-radius: 8px;
+            border-left: 4px solid #f44336;
+        }
+
+        .result-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .result-detail { font-size: 13px; color: #555; }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+            padding: 8px 20px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .download-btn:hover { background: #388e3c; }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .config-preset-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            padding: 6px 14px;
+            border: 1px solid #d9dce3;
+            border-radius: 20px;
+            background: white;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .preset-btn:hover { border-color: #1a73e8; color: #1a73e8; }
+        .preset-btn.active { background: #1a73e8; color: white; border-color: #1a73e8; }
+
+        .advanced-toggle {
+            font-size: 13px;
+            color: #1a73e8;
+            cursor: pointer;
+            text-align: right;
+            margin-bottom: 8px;
+        }
+
+        .advanced-toggle:hover { text-decoration: underline; }
+
+        @media (max-width: 640px) {
+            .container { padding: 0 12px; }
+            .card { padding: 16px; }
+            .config-grid { grid-template-columns: 1fr; }
+            .upload-zone { padding: 32px 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Word 文档格式化工具</h1>
+        <p>拖入文档，调整格式，一键处理 — 无需注册，即开即用</p>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-title">
+                <span class="step">1</span>
+                上传文档
+            </div>
+            <div class="upload-zone" id="uploadZone">
+                <span class="icon">📄</span>
+                <div class="main-text">将 .docx 文件拖放到这里，或点击选择文件</div>
+                <div class="sub-text">支持 Word 2007+ 格式 (.docx)</div>
+                <input type="file" id="fileInput" accept=".docx">
+            </div>
+            <div class="file-info" id="fileInfo">
+                <span class="file-icon">📝</span>
+                <div>
+                    <div class="file-name" id="fileName"></div>
+                    <div class="file-size" id="fileSize"></div>
+                </div>
+                <button class="remove-btn" id="removeBtn" title="移除文件">✕</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <span class="step">2</span>
+                调整格式
+            </div>
+
+            <div class="config-preset-bar">
+                <button class="preset-btn active" data-preset="default">默认 (学术论文)</button>
+                <button class="preset-btn" data-preset="report">报告</button>
+                <button class="preset-btn" data-preset="thesis">学位论文</button>
+            </div>
+
+            <div class="advanced-toggle" id="advancedToggle">展开高级设置 ▼</div>
+
+            <div id="advancedConfig" style="display:none;">
+                <div class="config-section">
+                    <div class="config-section-title" data-target="headingConfig">
+                        标题格式 <span class="arrow">▼</span>
+                    </div>
+                    <div class="config-grid" id="headingConfig">
+                        <div class="config-item">
+                            <label>一级标题字体</label>
+                            <select id="h1_font_cn">
+                                <option value="黑体">黑体</option>
+                                <option value="宋体">宋体</option>
+                                <option value="楷体">楷体</option>
+                                <option value="仿宋">仿宋</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>一级标题字号</label>
+                            <select id="h1_size">
+                                <option value="14">四号 (14pt)</option>
+                                <option value="16">三号 (16pt)</option>
+                                <option value="18">小二 (18pt)</option>
+                                <option value="22">二号 (22pt)</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>二级标题字体</label>
+                            <select id="h2_font_cn">
+                                <option value="黑体">黑体</option>
+                                <option value="宋体">宋体</option>
+                                <option value="楷体">楷体</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>二级标题字号</label>
+                            <select id="h2_size">
+                                <option value="12">小四 (12pt)</option>
+                                <option value="14">四号 (14pt)</option>
+                                <option value="16">三号 (16pt)</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>三级标题字体</label>
+                            <select id="h3_font_cn">
+                                <option value="宋体">宋体</option>
+                                <option value="黑体">黑体</option>
+                                <option value="楷体">楷体</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>三级标题字号</label>
+                            <select id="h3_size">
+                                <option value="12">小四 (12pt)</option>
+                                <option value="14">四号 (14pt)</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>一级标题行距</label>
+                            <select id="h1_line_spacing">
+                                <option value="1.0">1.0 倍</option>
+                                <option value="1.25">1.25 倍</option>
+                                <option value="1.5">1.5 倍</option>
+                                <option value="2.0">2.0 倍</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>二级标题行距</label>
+                            <select id="h2_line_spacing">
+                                <option value="1.0">1.0 倍</option>
+                                <option value="1.25">1.25 倍</option>
+                                <option value="1.5">1.5 倍</option>
+                                <option value="2.0">2.0 倍</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>三级标题行距</label>
+                            <select id="h3_line_spacing">
+                                <option value="1.0">1.0 倍</option>
+                                <option value="1.25">1.25 倍</option>
+                                <option value="1.5">1.5 倍</option>
+                                <option value="2.0">2.0 倍</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <div class="config-section-title" data-target="bodyConfig">
+                        正文格式 <span class="arrow">▼</span>
+                    </div>
+                    <div class="config-grid" id="bodyConfig">
+                        <div class="config-item">
+                            <label>正文字体</label>
+                            <select id="body_font_cn">
+                                <option value="宋体">宋体</option>
+                                <option value="黑体">黑体</option>
+                                <option value="楷体">楷体</option>
+                                <option value="仿宋">仿宋</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>正文字号</label>
+                            <select id="body_size">
+                                <option value="12">小四 (12pt)</option>
+                                <option value="10.5">五号 (10.5pt)</option>
+                                <option value="14">四号 (14pt)</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>行距倍数</label>
+                            <select id="body_line_spacing">
+                                <option value="1.0">1.0 倍</option>
+                                <option value="1.25">1.25 倍</option>
+                                <option value="1.5" selected>1.5 倍</option>
+                                <option value="2.0">2.0 倍</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>英文/数字字体</label>
+                            <select id="en_font">
+                                <option value="Times New Roman">Times New Roman</option>
+                                <option value="Arial">Arial</option>
+                                <option value="Calibri">Calibri</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <div class="config-section-title" data-target="tableConfig">
+                        表格与图标题 <span class="arrow">▼</span>
+                    </div>
+                    <div class="config-grid" id="tableConfig">
+                        <div class="config-item">
+                            <label>表标题字号</label>
+                            <select id="table_caption_size">
+                                <option value="12">小四 (12pt)</option>
+                                <option value="10.5">五号 (10.5pt)</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>表格内容字号</label>
+                            <select id="table_content_size">
+                                <option value="12">小四 (12pt)</option>
+                                <option value="10.5">五号 (10.5pt)</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>图标题字号</label>
+                            <select id="figure_caption_size">
+                                <option value="12">小四 (12pt)</option>
+                                <option value="10.5">五号 (10.5pt)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <span class="step">3</span>
+                开始处理
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary" id="formatBtn" disabled>
+                    <span id="formatBtnText">开始格式化</span>
+                </button>
+                <button class="btn btn-secondary" id="resetBtn">重置设置</button>
+            </div>
+
+            <div class="progress-area" id="progressArea">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="progress-text" id="progressText">正在上传文件...</div>
+            </div>
+
+            <div class="result-area" id="resultArea"></div>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            file: null,
+            sessionId: null,
+            filename: null,
+            isProcessing: false
+        };
+
+        const presets = {
+            default: {},
+            report: {
+                h1_font_cn: '黑体', h1_size: '16',
+                h2_font_cn: '黑体', h2_size: '14',
+                h3_font_cn: '黑体', h3_size: '12',
+                body_font_cn: '宋体', body_size: '12',
+                body_line_spacing: '1.5', en_font: 'Times New Roman'
+            },
+            thesis: {
+                h1_font_cn: '黑体', h1_size: '18',
+                h2_font_cn: '黑体', h2_size: '16',
+                h3_font_cn: '黑体', h3_size: '14',
+                body_font_cn: '宋体', body_size: '12',
+                body_line_spacing: '2.0', en_font: 'Times New Roman'
+            }
+        };
+
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const removeBtn = document.getElementById('removeBtn');
+        const formatBtn = document.getElementById('formatBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const formatBtnText = document.getElementById('formatBtnText');
+        const progressArea = document.getElementById('progressArea');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const resultArea = document.getElementById('resultArea');
+        const advancedToggle = document.getElementById('advancedToggle');
+        const advancedConfig = document.getElementById('advancedConfig');
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function setFile(file) {
+            if (!file || !file.name.endsWith('.docx')) {
+                alert('请选择 .docx 格式的 Word 文件');
+                return;
+            }
+            state.file = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileInfo.classList.add('show');
+            uploadZone.style.display = 'none';
+            formatBtn.disabled = false;
+            resultArea.classList.remove('show');
+        }
+
+        function clearFile() {
+            state.file = null;
+            state.sessionId = null;
+            state.filename = null;
+            fileInput.value = '';
+            fileInfo.classList.remove('show');
+            uploadZone.style.display = '';
+            formatBtn.disabled = true;
+            resultArea.classList.remove('show');
+        }
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) setFile(file);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) setFile(e.target.files[0]);
+        });
+
+        removeBtn.addEventListener('click', clearFile);
+
+        advancedToggle.addEventListener('click', () => {
+            const isHidden = advancedConfig.style.display === 'none';
+            advancedConfig.style.display = isHidden ? '' : 'none';
+            advancedToggle.textContent = isHidden ? '收起高级设置 ▲' : '展开高级设置 ▼';
+        });
+
+        document.querySelectorAll('.config-section-title').forEach(title => {
+            title.addEventListener('click', () => {
+                const target = document.getElementById(title.dataset.target);
+                const arrow = title.querySelector('.arrow');
+                const isCollapsed = target.classList.toggle('collapsed');
+                arrow.classList.toggle('collapsed', isCollapsed);
+            });
+        });
+
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const preset = presets[btn.dataset.preset];
+                Object.keys(preset).forEach(key => {
+                    const el = document.getElementById(key);
+                    if (el) el.value = preset[key];
+                });
+            });
+        });
+
+        resetBtn.addEventListener('click', () => {
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-preset="default"]').classList.add('active');
+            Object.keys(presets.default).forEach(key => {
+                const el = document.getElementById(key);
+                if (el) el.value = presets.default[key] || el.options[0].value;
+            });
+        });
+
+        function buildConfigJSON() {
+            const config = {
+                global: {
+                    english_number_font: document.getElementById('en_font').value
+                },
+                headings: {
+                    level1: {
+                        font_name_cn: document.getElementById('h1_font_cn').value,
+                        font_name_en: document.getElementById('en_font').value,
+                        font_size: parseFloat(document.getElementById('h1_size').value),
+                        bold: true,
+                        alignment: 'left',
+                        line_spacing: parseFloat(document.getElementById('h1_line_spacing').value),
+                        space_before: 0,
+                        space_after: 0
+                    },
+                    level2: {
+                        font_name_cn: document.getElementById('h2_font_cn').value,
+                        font_name_en: document.getElementById('en_font').value,
+                        font_size: parseFloat(document.getElementById('h2_size').value),
+                        bold: true,
+                        alignment: 'left',
+                        line_spacing: parseFloat(document.getElementById('h2_line_spacing').value),
+                        space_before: 0,
+                        space_after: 0
+                    },
+                    level3: {
+                        font_name_cn: document.getElementById('h3_font_cn').value,
+                        font_name_en: document.getElementById('en_font').value,
+                        font_size: parseFloat(document.getElementById('h3_size').value),
+                        bold: true,
+                        alignment: 'left',
+                        line_spacing: parseFloat(document.getElementById('h3_line_spacing').value),
+                        space_before: 0,
+                        space_after: 0
+                    }
+                },
+                paragraph: {
+                    font_name_cn: document.getElementById('body_font_cn').value,
+                    font_name_en: document.getElementById('en_font').value,
+                    font_size: parseFloat(document.getElementById('body_size').value),
+                    bold: false,
+                    line_spacing: parseFloat(document.getElementById('body_line_spacing').value),
+                    alignment: 'justify',
+                    first_line_indent: 0,
+                    char_spacing: 0,
+                    space_before: 0,
+                    space_after: 0
+                },
+                table: {
+                    caption: {
+                        font_name_cn: '宋体',
+                        font_name_en: document.getElementById('en_font').value,
+                        font_size: parseFloat(document.getElementById('table_caption_size').value),
+                        bold: true,
+                        alignment: 'center',
+                        space_before: 6,
+                        space_after: 6
+                    },
+                    content: {
+                        font_name_cn: '宋体',
+                        font_name_en: document.getElementById('en_font').value,
+                        font_size: parseFloat(document.getElementById('table_content_size').value),
+                        bold: false,
+                        alignment: 'center',
+                        vertical_alignment: 'center'
+                    },
+                    style: {
+                        border_style: 'three_line',
+                        top_border_width: 1.5,
+                        middle_border_width: 0.75,
+                        bottom_border_width: 1.5
+                    }
+                },
+                figure: {
+                    caption: {
+                        font_name_cn: '宋体',
+                        font_name_en: document.getElementById('en_font').value,
+                        font_size: parseFloat(document.getElementById('figure_caption_size').value),
+                        bold: true,
+                        alignment: 'center',
+                        space_before: 6,
+                        space_after: 6
+                    }
+                },
+                reference: {
+                    title: {
+                        font_name_cn: '黑体',
+                        font_name_en: document.getElementById('en_font').value,
+                        font_size: 10.5,
+                        bold: true,
+                        alignment: 'center',
+                        space_before: 12,
+                        space_after: 6
+                    },
+                    content: {
+                        font_name_cn: '宋体',
+                        font_name_en: document.getElementById('en_font').value,
+                        font_size: 10.5,
+                        bold: false,
+                        alignment: 'left',
+                        line_spacing: 1.5
+                    }
+                }
+            };
+            return config;
+        }
+
+        function setProgress(percent, text) {
+            progressArea.classList.add('show');
+            progressBar.style.width = percent + '%';
+            progressBar.classList.toggle('indeterminate', percent === 0);
+            progressText.textContent = text;
+        }
+
+        function showResult(success, message, downloadUrl) {
+            progressArea.classList.remove('show');
+            resultArea.classList.add('show');
+
+            if (success) {
+                resultArea.innerHTML = `
+                    <div class="result-success">
+                        <div class="result-title">✅ 处理完成</div>
+                        <div class="result-detail">${message}</div>
+                        <a class="download-btn" href="${downloadUrl}" download>📥 下载格式化文档</a>
+                    </div>
+                `;
+            } else {
+                resultArea.innerHTML = `
+                    <div class="result-error">
+                        <div class="result-title">❌ 处理失败</div>
+                        <div class="result-detail">${message}</div>
+                    </div>
+                `;
+            }
+        }
+
+        async function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            const resp = await fetch('/api/upload', { method: 'POST', body: formData });
+            if (!resp.ok) {
+                const err = await resp.json();
+                throw new Error(err.detail || '上传失败');
+            }
+            return await resp.json();
+        }
+
+        async function formatDocument(sessionId, filename, configJSON) {
+            const formData = new FormData();
+            formData.append('session_id', sessionId);
+            formData.append('filename', filename);
+            formData.append('config_json', configJSON);
+            const resp = await fetch('/api/format', { method: 'POST', body: formData });
+            return await resp.json();
+        }
+
+        formatBtn.addEventListener('click', async () => {
+            if (!state.file || state.isProcessing) return;
+            state.isProcessing = true;
+            formatBtn.disabled = true;
+            formatBtnText.innerHTML = '<span class="spinner"></span> 处理中...';
+            resultArea.classList.remove('show');
+
+            try {
+                setProgress(0, '正在上传文件...');
+                const uploadResult = await uploadFile(state.file);
+                state.sessionId = uploadResult.session_id;
+                state.filename = uploadResult.filename;
+
+                setProgress(40, '正在格式化文档，请稍候...');
+
+                const configJSON = JSON.stringify(buildConfigJSON());
+                const formatResult = await formatDocument(state.sessionId, state.filename, configJSON);
+
+                if (formatResult.success) {
+                    const downloadUrl = `/api/download/${formatResult.session_id}/${formatResult.output_filename}`;
+                    setProgress(100, '处理完成！');
+                    setTimeout(() => {
+                        showResult(true, formatResult.message, downloadUrl);
+                    }, 300);
+                } else {
+                    showResult(false, formatResult.message || '格式化失败');
+                }
+            } catch (err) {
+                showResult(false, err.message || '处理过程中出现错误');
+            } finally {
+                state.isProcessing = false;
+                formatBtn.disabled = false;
+                formatBtnText.textContent = '开始格式化';
+            }
+        });
+
+        document.addEventListener('dragover', (e) => e.preventDefault());
+        document.addEventListener('drop', (e) => e.preventDefault());
+    </script>
+</body>
+</html>

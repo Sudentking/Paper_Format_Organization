@@ -1,0 +1,152 @@
+# Word文档格式配置文件
+# 所有尺寸单位：字号使用"号"，如"四号"对应14磅
+# 字号对照：初号42, 小初36, 一号26, 小一24, 二号22, 小二18, 三号16, 小三15, 四号14, 小四12, 五号10.5, 小五9
+
+# 全局设置
+global:
+  english_number_font: "Times New Roman"
+
+# 标题格式
+headings:
+  level1:
+    font_name_cn: "黑体"
+    font_name_en: "Times New Roman"
+    font_size: 14
+    bold: true
+    alignment: "left"
+    line_spacing: 1.0
+    space_before: 0
+    space_after: 0
+
+  level2:
+    font_name_cn: "黑体"
+    font_name_en: "Times New Roman"
+    font_size: 12
+    bold: true
+    alignment: "left"
+    line_spacing: 1.0
+    space_before: 0
+    space_after: 0
+
+  level3:
+    font_name_cn: "宋体"
+    font_name_en: "Times New Roman"
+    font_size: 12
+    bold: true
+    alignment: "left"
+    line_spacing: 1.0
+    space_before: 0
+    space_after: 0
+
+# 正文格式
+paragraph:
+  font_name_cn: "宋体"
+  font_name_en: "Times New Roman"
+  font_size: 12
+  bold: false
+  line_spacing: 1.5
+  alignment: "justify"
+  first_line_indent: 0
+  char_spacing: 0
+  space_before: 0
+  space_after: 0
+
+# 表格格式
+table:
+  caption:
+    font_name_cn: "宋体"
+    font_name_en: "Times New Roman"
+    font_size: 12
+    bold: true
+    alignment: "center"
+    space_before: 6
+    space_after: 6
+
+  content:
+    font_name_cn: "宋体"
+    font_name_en: "Times New Roman"
+    font_size: 12
+    bold: false
+    alignment: "center"
+    vertical_alignment: "center"
+
+  style:
+    border_style: "three_line"
+    top_border_width: 1.5
+    middle_border_width: 0.75
+    bottom_border_width: 1.5
+
+# 图标题格式
+figure:
+  caption:
+    font_name_cn: "宋体"
+    font_name_en: "Times New Roman"
+    font_size: 12
+    bold: true
+    alignment: "center"
+    space_before: 6
+    space_after: 6
+
+# 参考文献格式
+reference:
+  title:
+    font_name_cn: "黑体"
+    font_name_en: "Times New Roman"
+    font_size: 10.5
+    bold: true
+    alignment: "center"
+    space_before: 12
+    space_after: 6
+
+  content:
+    font_name_cn: "宋体"
+    font_name_en: "Times New Roman"
+    font_size: 10.5
+    bold: false
+    alignment: "left"
+    line_spacing: 1.5
+
+# 目录格式
+toc:
+  title:
+    font_name_cn: "黑体"
+    font_name_en: "Times New Roman"
+    font_size: 16
+    bold: true
+    alignment: "center"
+    space_before: 12
+    space_after: 12
+
+  level1:
+    font_name_cn: "宋体"
+    font_name_en: "Times New Roman"
+    font_size: 12
+    bold: true
+    indent: 0
+
+  level2:
+    font_name_cn: "宋体"
+    font_name_en: "Times New Roman"
+    font_size: 12
+    bold: false
+    indent: 2
+
+  level3:
+    font_name_cn: "宋体"
+    font_name_en: "Times New Roman"
+    font_size: 12
+    bold: false
+    indent: 4
+
+  line_spacing: 1.5
+
+# 识别规则
+recognition:
+  heading_patterns:
+    level1: '^[0-9]+\s+'
+    level2: '^[0-9]+\.[0-9]+\s+'
+    level3: '^[0-9]+\.[0-9]+\.[0-9]+\s+'
+
+  table_caption_pattern: '^表[0-9]+\.?[0-9]*\s+'
+  figure_caption_pattern: '^图[0-9]+\.?[0-9]*\s+'
+  reference_title_pattern: '^参考文献$'
