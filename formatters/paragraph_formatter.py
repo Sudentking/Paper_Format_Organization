@@ -1,5 +1,6 @@
 from .base_formatter import BaseFormatter
 from .toc_formatter import is_toc_entry, is_toc_style
+from .heading_formatter import SPECIAL_HEADING_PATTERNS
 from utils.docx_helper import (
     set_paragraph_format, format_paragraph_text, detect_heading_level, match_pattern,
 )
@@ -31,6 +32,11 @@ class ParagraphFormatter(BaseFormatter):
 
         if detect_heading_level(paragraph, self.heading_patterns):
             return True
+
+        text_stripped = text.strip()
+        for pattern in SPECIAL_HEADING_PATTERNS:
+            if pattern.match(text_stripped):
+                return True
 
         if match_pattern(text, self.table_pattern):
             return True

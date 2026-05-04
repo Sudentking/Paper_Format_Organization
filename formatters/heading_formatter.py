@@ -1,8 +1,17 @@
+import re
 from .base_formatter import BaseFormatter
 from .toc_formatter import is_toc_entry, is_toc_style
 from utils.docx_helper import (
     set_paragraph_format, format_paragraph_text, detect_heading_level,
 )
+from docx.oxml.ns import qn
+
+SPECIAL_HEADING_PATTERNS = [
+    re.compile(r'^摘\s*要$'),
+    re.compile(r'^Abstract$', re.IGNORECASE),
+    re.compile(r'^关键词[：:]?$'),
+    re.compile(r'^Keywords[：:]?$', re.IGNORECASE),
+]
 
 
 class HeadingFormatter(BaseFormatter):
@@ -16,9 +25,32 @@ class HeadingFormatter(BaseFormatter):
             style_name = paragraph.style.name if paragraph.style else ''
             if is_toc_entry(paragraph.text) or is_toc_style(style_name):
                 continue
+
+            special_level = self._detect_special_heading(paragraph)
+            if special_level:
+                self._format_heading(paragraph, special_level)
+                continue
+
             level = detect_heading_level(paragraph, self.patterns)
             if level:
                 self._format_heading(paragraph, level)
+
+    def _detect_special_heading(self, paragraph):
+        text = paragraph.text.strip()
+        if not text:
+            return None
+
+        pPr = paragraph._element.find(qn('w:pPr'))
+        if pPr is not None:
+            ol = pPr.find(qn('w:outlineLvl'))
+            if ol is not None:
+                return None
+
+        for pattern in SPECIAL_HEADING_PATTERNS:
+            if pattern.match(text):
+                return 'level1'
+
+        return None
 
     def _format_heading(self, paragraph, level):
         cfg = self.heading_config.get(level, {})
