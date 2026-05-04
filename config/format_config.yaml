@@ -117,28 +117,35 @@ toc:
     space_before: 12
     space_after: 12
 
-  level1:
-    font_name_cn: "宋体"
+  chapter:
+    font_name_cn: "黑体"
     font_name_en: "Times New Roman"
     font_size: 12
     bold: true
     indent: 0
 
-  level2:
+  section:
     font_name_cn: "宋体"
     font_name_en: "Times New Roman"
     font_size: 12
     bold: false
     indent: 2
 
-  level3:
+  subsection:
     font_name_cn: "宋体"
     font_name_en: "Times New Roman"
     font_size: 12
     bold: false
     indent: 4
 
-  line_spacing: 1.5
+  line_spacing: 1.25
+
+  special_entries:
+    - "摘要"
+    - "Abstract"
+    - "结论"
+    - "参考文献"
+    - "致谢"
 
 # 识别规则
 recognition:

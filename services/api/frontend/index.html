@@ -473,6 +473,27 @@
                             </select>
                         </div>
                         <div class="config-item">
+                            <label>一级标题对齐</label>
+                            <select id="h1_alignment">
+                                <option value="left">左对齐</option>
+                                <option value="center">居中</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>二级标题对齐</label>
+                            <select id="h2_alignment">
+                                <option value="left">左对齐</option>
+                                <option value="center">居中</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>三级标题对齐</label>
+                            <select id="h3_alignment">
+                                <option value="left">左对齐</option>
+                                <option value="center">居中</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
                             <label>一级标题行距</label>
                             <select id="h1_line_spacing">
                                 <option value="1.0">1.0 倍</option>
@@ -541,6 +562,14 @@
                                 <option value="Calibri">Calibri</option>
                             </select>
                         </div>
+                        <div class="config-item">
+                            <label>正文对齐</label>
+                            <select id="body_alignment">
+                                <option value="justify">两端对齐</option>
+                                <option value="left">左对齐</option>
+                                <option value="center">居中</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -568,6 +597,65 @@
                             <select id="figure_caption_size">
                                 <option value="12">小四 (12pt)</option>
                                 <option value="10.5">五号 (10.5pt)</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>表标题对齐</label>
+                            <select id="table_caption_alignment">
+                                <option value="center">居中</option>
+                                <option value="left">左对齐</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>图标题对齐</label>
+                            <select id="figure_caption_alignment">
+                                <option value="center">居中</option>
+                                <option value="left">左对齐</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <div class="config-section-title" data-target="tocConfig">
+                        目录格式 <span class="arrow">▼</span>
+                    </div>
+                    <div class="config-grid" id="tocConfig">
+                        <div class="config-item">
+                            <label>章标题字体</label>
+                            <select id="toc_chapter_font">
+                                <option value="黑体">黑体</option>
+                                <option value="宋体">宋体</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>章标题字号</label>
+                            <select id="toc_chapter_size">
+                                <option value="12">小四 (12pt)</option>
+                                <option value="14">四号 (14pt)</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>节标题字体</label>
+                            <select id="toc_section_font">
+                                <option value="宋体">宋体</option>
+                                <option value="黑体">黑体</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>节标题字号</label>
+                            <select id="toc_section_size">
+                                <option value="12">小四 (12pt)</option>
+                                <option value="14">四号 (14pt)</option>
+                            </select>
+                        </div>
+                        <div class="config-item">
+                            <label>目录行距</label>
+                            <select id="toc_line_spacing">
+                                <option value="1.0">1.0 倍</option>
+                                <option value="1.25" selected>1.25 倍</option>
+                                <option value="1.5">1.5 倍</option>
+                                <option value="2.0">2.0 倍</option>
                             </select>
                         </div>
                     </div>
@@ -730,37 +818,44 @@
         });
 
         function buildConfigJSON() {
+            const enFont = document.getElementById('en_font').value;
+            const tocChapterFont = document.getElementById('toc_chapter_font').value;
+            const tocChapterSize = parseFloat(document.getElementById('toc_chapter_size').value);
+            const tocSectionFont = document.getElementById('toc_section_font').value;
+            const tocSectionSize = parseFloat(document.getElementById('toc_section_size').value);
+            const tocLineSpacing = parseFloat(document.getElementById('toc_line_spacing').value);
+
             const config = {
                 global: {
-                    english_number_font: document.getElementById('en_font').value
+                    english_number_font: enFont
                 },
                 headings: {
                     level1: {
                         font_name_cn: document.getElementById('h1_font_cn').value,
-                        font_name_en: document.getElementById('en_font').value,
+                        font_name_en: enFont,
                         font_size: parseFloat(document.getElementById('h1_size').value),
                         bold: true,
-                        alignment: 'left',
+                        alignment: document.getElementById('h1_alignment').value,
                         line_spacing: parseFloat(document.getElementById('h1_line_spacing').value),
                         space_before: 0,
                         space_after: 0
                     },
                     level2: {
                         font_name_cn: document.getElementById('h2_font_cn').value,
-                        font_name_en: document.getElementById('en_font').value,
+                        font_name_en: enFont,
                         font_size: parseFloat(document.getElementById('h2_size').value),
                         bold: true,
-                        alignment: 'left',
+                        alignment: document.getElementById('h2_alignment').value,
                         line_spacing: parseFloat(document.getElementById('h2_line_spacing').value),
                         space_before: 0,
                         space_after: 0
                     },
                     level3: {
                         font_name_cn: document.getElementById('h3_font_cn').value,
-                        font_name_en: document.getElementById('en_font').value,
+                        font_name_en: enFont,
                         font_size: parseFloat(document.getElementById('h3_size').value),
                         bold: true,
-                        alignment: 'left',
+                        alignment: document.getElementById('h3_alignment').value,
                         line_spacing: parseFloat(document.getElementById('h3_line_spacing').value),
                         space_before: 0,
                         space_after: 0
@@ -768,11 +863,11 @@
                 },
                 paragraph: {
                     font_name_cn: document.getElementById('body_font_cn').value,
-                    font_name_en: document.getElementById('en_font').value,
+                    font_name_en: enFont,
                     font_size: parseFloat(document.getElementById('body_size').value),
                     bold: false,
                     line_spacing: parseFloat(document.getElementById('body_line_spacing').value),
-                    alignment: 'justify',
+                    alignment: document.getElementById('body_alignment').value,
                     first_line_indent: 0,
                     char_spacing: 0,
                     space_before: 0,
@@ -781,16 +876,16 @@
                 table: {
                     caption: {
                         font_name_cn: '宋体',
-                        font_name_en: document.getElementById('en_font').value,
+                        font_name_en: enFont,
                         font_size: parseFloat(document.getElementById('table_caption_size').value),
                         bold: true,
-                        alignment: 'center',
+                        alignment: document.getElementById('table_caption_alignment').value,
                         space_before: 6,
                         space_after: 6
                     },
                     content: {
                         font_name_cn: '宋体',
-                        font_name_en: document.getElementById('en_font').value,
+                        font_name_en: enFont,
                         font_size: parseFloat(document.getElementById('table_content_size').value),
                         bold: false,
                         alignment: 'center',
@@ -806,10 +901,10 @@
                 figure: {
                     caption: {
                         font_name_cn: '宋体',
-                        font_name_en: document.getElementById('en_font').value,
+                        font_name_en: enFont,
                         font_size: parseFloat(document.getElementById('figure_caption_size').value),
                         bold: true,
-                        alignment: 'center',
+                        alignment: document.getElementById('figure_caption_alignment').value,
                         space_before: 6,
                         space_after: 6
                     }
@@ -817,7 +912,7 @@
                 reference: {
                     title: {
                         font_name_cn: '黑体',
-                        font_name_en: document.getElementById('en_font').value,
+                        font_name_en: enFont,
                         font_size: 10.5,
                         bold: true,
                         alignment: 'center',
@@ -826,12 +921,46 @@
                     },
                     content: {
                         font_name_cn: '宋体',
-                        font_name_en: document.getElementById('en_font').value,
+                        font_name_en: enFont,
                         font_size: 10.5,
                         bold: false,
                         alignment: 'left',
                         line_spacing: 1.5
                     }
+                },
+                toc: {
+                    title: {
+                        font_name_cn: '黑体',
+                        font_name_en: enFont,
+                        font_size: 16,
+                        bold: true,
+                        alignment: 'center',
+                        space_before: 12,
+                        space_after: 12
+                    },
+                    chapter: {
+                        font_name_cn: tocChapterFont,
+                        font_name_en: enFont,
+                        font_size: tocChapterSize,
+                        bold: true,
+                        indent: 0
+                    },
+                    section: {
+                        font_name_cn: tocSectionFont,
+                        font_name_en: enFont,
+                        font_size: tocSectionSize,
+                        bold: false,
+                        indent: 2
+                    },
+                    subsection: {
+                        font_name_cn: tocSectionFont,
+                        font_name_en: enFont,
+                        font_size: tocSectionSize,
+                        bold: false,
+                        indent: 4
+                    },
+                    line_spacing: tocLineSpacing,
+                    special_entries: ['摘要', 'Abstract', '结论', '参考文献', '致谢']
                 }
             };
             return config;

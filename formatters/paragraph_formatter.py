@@ -1,7 +1,10 @@
+import re
 from .base_formatter import BaseFormatter
 from utils.docx_helper import (
     set_paragraph_format, format_paragraph_text, detect_heading_level, match_pattern,
 )
+
+TOC_DOTS_PATTERN = re.compile(r'\.{2,}\s*\S+\s*$')
 
 
 class ParagraphFormatter(BaseFormatter):
@@ -22,6 +25,9 @@ class ParagraphFormatter(BaseFormatter):
     def _should_skip(self, paragraph):
         text = paragraph.text
         if not text.strip():
+            return True
+
+        if TOC_DOTS_PATTERN.search(text):
             return True
 
         if detect_heading_level(paragraph, self.heading_patterns):
