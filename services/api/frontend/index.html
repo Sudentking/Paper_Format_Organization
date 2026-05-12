@@ -3,99 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Word 文档格式化工具</title>
+    <title>DocFlow — Word 文档格式化工具</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        :root {
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-subtle: #dbeafe;
+            --surface-0: #fafafa;
+            --surface-1: #ffffff;
+            --surface-2: #f5f5f5;
+            --border: #e5e5e5;
+            --border-subtle: #f0f0f0;
+            --text-primary: #171717;
+            --text-secondary: #525252;
+            --text-muted: #a3a3a3;
+            --success: #16a34a;
+            --success-bg: #f0fdf4;
+            --success-border: #bbf7d0;
+            --error: #dc2626;
+            --error-bg: #fef2f2;
+            --error-border: #fecaca;
+            --warning-bg: #fffbeb;
+            --warning-border: #fde68a;
+            --warning-text: #92400e;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-            background: #f0f2f5;
-            color: #333;
+            background: var(--surface-0);
+            color: var(--text-primary);
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .header {
-            background: linear-gradient(135deg, #1a73e8, #0d47a1);
-            color: white;
-            padding: 24px 32px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        .app-header {
+            padding: 32px 0 0;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface-1);
         }
 
-        .header h1 { font-size: 24px; font-weight: 600; }
-        .header p { font-size: 14px; opacity: 0.85; margin-top: 4px; }
-
-        .container {
-            max-width: 960px;
-            margin: 24px auto;
-            padding: 0 16px;
+        .app-header-inner {
+            max-width: 840px;
+            margin: 0 auto;
+            padding: 0 24px 24px;
         }
 
-        .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-            padding: 24px;
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 16px;
+        .app-brand {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            margin-bottom: 4px;
         }
 
-        .card-title .step {
-            background: #1a73e8;
+        .app-brand-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
-            width: 24px;
-            height: 24px;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .app-brand-name {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--text-primary);
+        }
+
+        .app-tagline {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            padding-left: 38px;
+        }
+
+        .main {
+            max-width: 840px;
+            margin: 0 auto;
+            padding: 32px 24px 80px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            animation: fadeUp 0.4s ease-out both;
+        }
+
+        .section:nth-child(2) { animation-delay: 0.05s; }
+        .section:nth-child(3) { animation-delay: 0.1s; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .section-num {
+            width: 22px;
+            height: 22px;
+            background: var(--accent);
+            color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
+            font-size: 12px;
+            font-weight: 600;
             flex-shrink: 0;
         }
 
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
         .upload-zone {
-            border: 2px dashed #c4c9d4;
-            border-radius: 12px;
+            border: 1.5px dashed var(--border);
+            border-radius: var(--radius-lg);
             padding: 48px 24px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.25s;
-            background: #fafbfc;
+            transition: all var(--transition);
+            background: var(--surface-1);
             position: relative;
         }
 
-        .upload-zone:hover, .upload-zone.dragover {
-            border-color: #1a73e8;
-            background: #e8f0fe;
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: var(--accent);
+            background: var(--accent-subtle);
         }
 
         .upload-zone.dragover {
-            transform: scale(1.01);
+            transform: scale(1.005);
         }
 
-        .upload-zone .icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-            display: block;
+        .upload-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 12px;
+            background: var(--surface-2);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all var(--transition);
         }
 
-        .upload-zone .main-text {
-            font-size: 16px;
+        .upload-zone:hover .upload-icon,
+        .upload-zone.dragover .upload-icon {
+            background: var(--accent);
+            color: white;
+        }
+
+        .upload-main {
+            font-size: 14px;
             font-weight: 500;
-            color: #333;
+            color: var(--text-primary);
         }
 
-        .upload-zone .sub-text {
+        .upload-sub {
             font-size: 13px;
-            color: #888;
-            margin-top: 6px;
+            color: var(--text-muted);
+            margin-top: 4px;
         }
 
         .upload-zone input[type="file"] {
@@ -113,96 +204,126 @@
             align-items: center;
             gap: 12px;
             padding: 12px 16px;
-            background: #e8f5e9;
-            border-radius: 8px;
-            margin-top: 12px;
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
         }
 
         .file-info.show { display: flex; }
 
-        .file-info .file-icon { font-size: 28px; }
-        .file-info .file-name { font-weight: 500; font-size: 14px; }
-        .file-info .file-size { font-size: 12px; color: #666; }
-        .file-info .remove-btn {
-            margin-left: auto;
+        .file-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--accent-subtle);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .file-meta { flex: 1; min-width: 0; }
+        .file-name {
+            font-weight: 500;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .file-size { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+        .file-remove {
+            width: 28px;
+            height: 28px;
             background: none;
             border: none;
-            font-size: 18px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            color: #999;
-            padding: 4px 8px;
-            border-radius: 4px;
+            color: var(--text-muted);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition);
+            flex-shrink: 0;
         }
-        .file-info .remove-btn:hover { background: #f5f5f5; color: #333; }
+        .file-remove:hover { background: var(--surface-2); color: var(--text-primary); }
 
-        .config-section { margin-bottom: 16px; }
+        .config-bar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
 
-        .config-section-title {
-            font-size: 14px;
+        .preset-chip {
+            padding: 5px 14px;
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            background: var(--surface-1);
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition);
+            font-weight: 500;
+        }
+
+        .preset-chip:hover { border-color: var(--accent); color: var(--accent); }
+        .preset-chip.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .config-body {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .config-group {
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .config-group:last-child { border-bottom: none; }
+
+        .config-group-header {
+            padding: 12px 20px;
+            font-size: 13px;
             font-weight: 600;
-            color: #555;
-            margin-bottom: 10px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid #eee;
+            color: var(--text-secondary);
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
             user-select: none;
+            transition: color var(--transition);
         }
 
-        .config-section-title:hover { color: #1a73e8; }
+        .config-group-header:hover { color: var(--accent); }
 
-        .config-section-title .arrow {
-            transition: transform 0.2s;
-            font-size: 12px;
+        .config-group-header .chevron {
+            font-size: 10px;
+            transition: transform var(--transition);
+            color: var(--text-muted);
         }
 
-        .config-section-title .arrow.collapsed { transform: rotate(-90deg); }
+        .config-group-header .chevron.collapsed { transform: rotate(-90deg); }
 
-        .config-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px;
+        .config-group-body {
+            padding: 0 20px 16px;
         }
 
-        .config-grid.collapsed { display: none; }
-
-        .config-item {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .config-item label {
-            font-size: 12px;
-            color: #666;
-            font-weight: 500;
-        }
-
-        .config-item select,
-        .config-item input[type="number"] {
-            padding: 6px 10px;
-            border: 1px solid #d9dce3;
-            border-radius: 6px;
-            font-size: 13px;
-            background: white;
-            transition: border-color 0.2s;
-        }
-
-        .config-item select:focus,
-        .config-item input[type="number"]:focus {
-            outline: none;
-            border-color: #1a73e8;
-            box-shadow: 0 0 0 2px rgba(26,115,232,0.15);
-        }
+        .config-group-body.collapsed { display: none; }
 
         .config-row {
             display: flex;
             align-items: center;
             gap: 12px;
             padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid var(--border-subtle);
             flex-wrap: wrap;
         }
 
@@ -211,81 +332,141 @@
         .config-row-label {
             font-size: 13px;
             font-weight: 600;
-            color: #1a73e8;
-            min-width: 80px;
+            color: var(--accent);
+            min-width: 72px;
             flex-shrink: 0;
         }
 
-        .config-row .config-item {
+        .config-row .field {
             flex: 1;
-            min-width: 120px;
+            min-width: 110px;
         }
 
-        .btn-row {
+        .field {
             display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .field-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .field select,
+        .field input[type="number"] {
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            background: var(--surface-1);
+            color: var(--text-primary);
+            transition: all var(--transition);
+            font-family: inherit;
+            width: 100%;
+        }
+
+        .field select:focus,
+        .field input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+        }
+
+        .field select:hover,
+        .field input[type="number"]:hover {
+            border-color: #d4d4d4;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             gap: 12px;
-            margin-top: 16px;
+            padding-top: 4px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
 
         .btn {
-            padding: 10px 24px;
+            padding: 9px 20px;
             border: none;
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
+            transition: all var(--transition);
+            display: inline-flex;
             align-items: center;
             gap: 6px;
+            font-family: inherit;
         }
 
         .btn:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
         }
 
         .btn-primary {
-            background: #1a73e8;
+            background: var(--accent);
             color: white;
         }
 
         .btn-primary:hover:not(:disabled) {
-            background: #1557b0;
-            box-shadow: 0 2px 8px rgba(26,115,232,0.3);
+            background: var(--accent-hover);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
         }
 
-        .btn-secondary {
-            background: #f1f3f4;
-            color: #333;
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
         }
 
-        .btn-secondary:hover:not(:disabled) { background: #e2e5e8; }
+        .btn-ghost:hover:not(:disabled) {
+            background: var(--surface-2);
+            border-color: #d4d4d4;
+        }
 
-        .progress-area {
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #15803d;
+        }
+
+        .progress-wrap {
             display: none;
             margin-top: 16px;
         }
 
-        .progress-area.show { display: block; }
+        .progress-wrap.show { display: block; }
 
-        .progress-bar-bg {
+        .progress-track {
             width: 100%;
-            height: 6px;
-            background: #e8e8e8;
-            border-radius: 3px;
+            height: 3px;
+            background: var(--surface-2);
+            border-radius: 2px;
             overflow: hidden;
         }
 
-        .progress-bar {
+        .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #1a73e8, #4caf50);
-            border-radius: 3px;
+            background: var(--accent);
+            border-radius: 2px;
             transition: width 0.3s;
             width: 0%;
         }
 
-        .progress-bar.indeterminate {
+        .progress-fill.indeterminate {
             width: 30%;
             animation: slide 1.2s ease-in-out infinite;
         }
@@ -295,64 +476,47 @@
             100% { transform: translateX(400%); }
         }
 
-        .progress-text {
+        .progress-label {
             font-size: 13px;
-            color: #666;
+            color: var(--text-muted);
             margin-top: 8px;
-            text-align: center;
         }
 
-        .result-area {
+        .result-wrap {
             display: none;
             margin-top: 16px;
         }
 
-        .result-area.show { display: block; }
+        .result-wrap.show { display: block; }
 
-        .result-success {
-            padding: 16px;
-            background: #e8f5e9;
-            border-radius: 8px;
-            border-left: 4px solid #4caf50;
-        }
-
-        .result-error {
-            padding: 16px;
-            background: #fce4ec;
-            border-radius: 8px;
-            border-left: 4px solid #f44336;
-        }
-
-        .result-title {
-            font-weight: 600;
+        .result-box {
+            padding: 14px 16px;
+            border-radius: var(--radius-md);
             font-size: 14px;
-            margin-bottom: 8px;
         }
 
-        .result-detail { font-size: 13px; color: #555; }
-
-        .download-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 12px;
-            padding: 8px 20px;
-            background: #4caf50;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background 0.2s;
+        .result-box.success {
+            background: var(--success-bg);
+            border: 1px solid var(--success-border);
+            color: #166534;
         }
 
-        .download-btn:hover { background: #388e3c; }
+        .result-box.error {
+            background: var(--error-bg);
+            border: 1px solid var(--error-border);
+            color: #991b1b;
+        }
+
+        .result-box strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
 
         .spinner {
             display: inline-block;
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             border: 2px solid rgba(255,255,255,0.3);
             border-top-color: white;
             border-radius: 50%;
@@ -361,100 +525,71 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .config-preset-bar {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
+        .footer-note {
+            text-align: center;
+            padding: 24px;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-subtle);
+            margin-top: 40px;
         }
 
-        .preset-btn {
-            padding: 6px 14px;
-            border: 1px solid #d9dce3;
-            border-radius: 20px;
-            background: white;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
+        .footer-note a {
+            color: var(--text-muted);
+            text-decoration: none;
         }
-
-        .preset-btn:hover { border-color: #1a73e8; color: #1a73e8; }
-        .preset-btn.active { background: #1a73e8; color: white; border-color: #1a73e8; }
-
-        .advanced-toggle {
-            font-size: 13px;
-            color: #1a73e8;
-            cursor: pointer;
-            text-align: right;
-            margin-bottom: 8px;
-        }
-
-        .advanced-toggle:hover { text-decoration: underline; }
+        .footer-note a:hover { color: var(--text-secondary); }
 
         @media (max-width: 640px) {
-            .container { padding: 0 12px; }
-            .card { padding: 16px; }
+            .main { padding: 24px 16px 60px; }
+            .app-header-inner { padding: 0 16px 20px; }
             .config-grid { grid-template-columns: 1fr; }
             .upload-zone { padding: 32px 16px; }
+            .config-row { flex-direction: column; align-items: stretch; }
+            .config-row-label { min-width: auto; }
         }
 
-        .preview-header {
-            background: linear-gradient(135deg, #1a73e8, #0d47a1);
-            color: white;
-            padding: 16px 32px;
+        .preview-page {
+            display: none;
+        }
+
+        .preview-bar {
+            background: var(--surface-1);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
-        .preview-header-title {
-            font-size: 18px;
+        .preview-bar-title {
+            font-size: 15px;
             font-weight: 600;
+            color: var(--text-primary);
         }
 
-        .preview-header .btn {
-            font-size: 13px;
-            padding: 8px 16px;
-        }
-
-        .preview-header .preview-back-btn {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-
-        .preview-header .preview-back-btn:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        .preview-header .preview-download-btn {
-            background: #4caf50;
-            color: white;
-            border: none;
-            text-decoration: none;
-        }
-
-        .preview-header .preview-download-btn:hover {
-            background: #388e3c;
+        .preview-bar-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
         }
 
         .preview-hint {
-            background: #fff3cd;
-            border-bottom: 1px solid #ffc107;
-            padding: 10px 32px;
+            background: var(--warning-bg);
+            border-bottom: 1px solid var(--warning-border);
+            padding: 10px 24px;
             font-size: 13px;
-            color: #856404;
+            color: var(--warning-text);
             text-align: center;
         }
 
-        .preview-frame-wrapper {
+        .preview-canvas {
             background: #e8e8e8;
-            padding: 24px;
-            min-height: calc(100vh - 200px);
+            padding: 32px 24px;
+            min-height: calc(100vh - 160px);
             display: flex;
             justify-content: center;
         }
@@ -462,86 +597,80 @@
         .preview-frame {
             width: 210mm;
             max-width: 100%;
-            min-height: calc(100vh - 250px);
+            min-height: calc(100vh - 220px);
             background: white;
             border: none;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
             border-radius: 2px;
         }
 
-        .preview-footer {
-            background: white;
-            padding: 16px 32px;
+        .preview-bottom {
+            background: var(--surface-1);
+            padding: 14px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-top: 1px solid #e0e0e0;
-            box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+            border-top: 1px solid var(--border);
             position: sticky;
             bottom: 0;
-        }
-
-        .preview-footer .btn-primary {
-            background: #4caf50;
-        }
-
-        .preview-footer .btn-primary:hover {
-            background: #388e3c;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Word 文档格式化工具</h1>
-        <p>拖入文档，调整格式，一键处理 — 无需注册，即开即用</p>
-    </div>
+    <header class="app-header" id="appHeader">
+        <div class="app-header-inner">
+            <div class="app-brand">
+                <div class="app-brand-icon">D</div>
+                <div class="app-brand-name">DocFlow</div>
+            </div>
+            <div class="app-tagline">拖入文档，调整格式，预览确认后下载</div>
+        </div>
+    </header>
 
-    <div class="container" id="mainContent">
-        <div class="card">
-            <div class="card-title">
-                <span class="step">1</span>
-                上传文档
+    <main class="main" id="mainContent">
+        <section class="section">
+            <div class="section-label">
+                <span class="section-num">1</span>
+                <span class="section-title">上传文档</span>
             </div>
             <div class="upload-zone" id="uploadZone">
-                <span class="icon">📄</span>
-                <div class="main-text">将 .docx 文件拖放到这里，或点击选择文件</div>
-                <div class="sub-text">支持 Word 2007+ 格式 (.docx)</div>
+                <div class="upload-icon">↑</div>
+                <div class="upload-main">将 .docx 文件拖放到这里，或点击选择</div>
+                <div class="upload-sub">支持 Word 2007+ 格式</div>
                 <input type="file" id="fileInput" accept=".docx">
             </div>
             <div class="file-info" id="fileInfo">
-                <span class="file-icon">📝</span>
-                <div>
+                <div class="file-icon">📄</div>
+                <div class="file-meta">
                     <div class="file-name" id="fileName"></div>
                     <div class="file-size" id="fileSize"></div>
                 </div>
-                <button class="remove-btn" id="removeBtn" title="移除文件">✕</button>
+                <button class="file-remove" id="removeBtn" title="移除文件">✕</button>
             </div>
-        </div>
+        </section>
 
-        <div class="card">
-            <div class="card-title">
-                <span class="step">2</span>
-                调整格式
-            </div>
-
-            <div class="config-preset-bar">
-                <button class="preset-btn active" data-preset="default">默认 (学术论文)</button>
-                <button class="preset-btn" data-preset="report">报告</button>
-                <button class="preset-btn" data-preset="thesis">学位论文</button>
+        <section class="section">
+            <div class="section-label">
+                <span class="section-num">2</span>
+                <span class="section-title">格式设置</span>
             </div>
 
-            <div class="advanced-toggle" id="advancedToggle">展开高级设置 ▼</div>
+            <div class="config-bar">
+                <button class="preset-chip active" data-preset="default">默认（学术论文）</button>
+                <button class="preset-chip" data-preset="report">报告</button>
+                <button class="preset-chip" data-preset="thesis">学位论文</button>
+            </div>
 
-            <div id="advancedConfig" style="display:none;">
-                <div class="config-section">
-                    <div class="config-section-title" data-target="headingConfig">
-                        标题格式 <span class="arrow">▼</span>
+            <div class="config-body">
+                <div class="config-group">
+                    <div class="config-group-header" data-target="headingConfig">
+                        标题格式 <span class="chevron">▾</span>
                     </div>
-                    <div id="headingConfig">
+                    <div class="config-group-body" id="headingConfig">
                         <div class="config-row">
                             <span class="config-row-label">一级标题</span>
-                            <div class="config-item">
-                                <label>字体</label>
+                            <div class="field">
+                                <span class="field-label">字体</span>
                                 <select id="h1_font_cn">
                                     <option value="黑体">黑体</option>
                                     <option value="宋体">宋体</option>
@@ -549,44 +678,44 @@
                                     <option value="仿宋">仿宋</option>
                                 </select>
                             </div>
-                            <div class="config-item">
-                                <label>字号</label>
+                            <div class="field">
+                                <span class="field-label">字号</span>
                                 <select id="h1_size">
-                                    <option value="10.5">五号 (10.5pt)</option>
-                                    <option value="12">小四 (12pt)</option>
-                                    <option value="14" selected>四号 (14pt)</option>
-                                    <option value="15">小三 (15pt)</option>
-                                    <option value="16">三号 (16pt)</option>
-                                    <option value="18">小二 (18pt)</option>
-                                    <option value="22">二号 (22pt)</option>
-                                    <option value="24">小一 (24pt)</option>
-                                    <option value="26">一号 (26pt)</option>
+                                    <option value="10.5">五号 10.5pt</option>
+                                    <option value="12">小四 12pt</option>
+                                    <option value="14" selected>四号 14pt</option>
+                                    <option value="15">小三 15pt</option>
+                                    <option value="16">三号 16pt</option>
+                                    <option value="18">小二 18pt</option>
+                                    <option value="22">二号 22pt</option>
+                                    <option value="24">小一 24pt</option>
+                                    <option value="26">一号 26pt</option>
                                 </select>
                             </div>
-                            <div class="config-item">
-                                <label>对齐</label>
+                            <div class="field">
+                                <span class="field-label">对齐</span>
                                 <select id="h1_alignment">
                                     <option value="left">左对齐</option>
                                     <option value="center">居中</option>
                                 </select>
                             </div>
-                            <div class="config-item">
-                                <label>行距</label>
+                            <div class="field">
+                                <span class="field-label">行距</span>
                                 <select id="h1_line_spacing">
-                                    <option value="1.0">1.0 倍</option>
-                                    <option value="1.25">1.25 倍</option>
-                                    <option value="1.5">1.5 倍</option>
-                                    <option value="1.75">1.75 倍</option>
-                                    <option value="2.0">2.0 倍</option>
-                                    <option value="2.5">2.5 倍</option>
-                                    <option value="3.0">3.0 倍</option>
+                                    <option value="1.0">1.0</option>
+                                    <option value="1.25">1.25</option>
+                                    <option value="1.5" selected>1.5</option>
+                                    <option value="1.75">1.75</option>
+                                    <option value="2.0">2.0</option>
+                                    <option value="2.5">2.5</option>
+                                    <option value="3.0">3.0</option>
                                 </select>
                             </div>
                         </div>
                         <div class="config-row">
                             <span class="config-row-label">二级标题</span>
-                            <div class="config-item">
-                                <label>字体</label>
+                            <div class="field">
+                                <span class="field-label">字体</span>
                                 <select id="h2_font_cn">
                                     <option value="黑体">黑体</option>
                                     <option value="宋体">宋体</option>
@@ -594,42 +723,42 @@
                                     <option value="仿宋">仿宋</option>
                                 </select>
                             </div>
-                            <div class="config-item">
-                                <label>字号</label>
+                            <div class="field">
+                                <span class="field-label">字号</span>
                                 <select id="h2_size">
-                                    <option value="10.5">五号 (10.5pt)</option>
-                                    <option value="12" selected>小四 (12pt)</option>
-                                    <option value="14">四号 (14pt)</option>
-                                    <option value="15">小三 (15pt)</option>
-                                    <option value="16">三号 (16pt)</option>
-                                    <option value="18">小二 (18pt)</option>
-                                    <option value="22">二号 (22pt)</option>
+                                    <option value="10.5">五号 10.5pt</option>
+                                    <option value="12" selected>小四 12pt</option>
+                                    <option value="14">四号 14pt</option>
+                                    <option value="15">小三 15pt</option>
+                                    <option value="16">三号 16pt</option>
+                                    <option value="18">小二 18pt</option>
+                                    <option value="22">二号 22pt</option>
                                 </select>
                             </div>
-                            <div class="config-item">
-                                <label>对齐</label>
+                            <div class="field">
+                                <span class="field-label">对齐</span>
                                 <select id="h2_alignment">
                                     <option value="left">左对齐</option>
                                     <option value="center">居中</option>
                                 </select>
                             </div>
-                            <div class="config-item">
-                                <label>行距</label>
+                            <div class="field">
+                                <span class="field-label">行距</span>
                                 <select id="h2_line_spacing">
-                                    <option value="1.0">1.0 倍</option>
-                                    <option value="1.25">1.25 倍</option>
-                                    <option value="1.5">1.5 倍</option>
-                                    <option value="1.75">1.75 倍</option>
-                                    <option value="2.0">2.0 倍</option>
-                                    <option value="2.5">2.5 倍</option>
-                                    <option value="3.0">3.0 倍</option>
+                                    <option value="1.0">1.0</option>
+                                    <option value="1.25">1.25</option>
+                                    <option value="1.5" selected>1.5</option>
+                                    <option value="1.75">1.75</option>
+                                    <option value="2.0">2.0</option>
+                                    <option value="2.5">2.5</option>
+                                    <option value="3.0">3.0</option>
                                 </select>
                             </div>
                         </div>
                         <div class="config-row">
                             <span class="config-row-label">三级标题</span>
-                            <div class="config-item">
-                                <label>字体</label>
+                            <div class="field">
+                                <span class="field-label">字体</span>
                                 <select id="h3_font_cn">
                                     <option value="宋体">宋体</option>
                                     <option value="黑体">黑体</option>
@@ -637,244 +766,248 @@
                                     <option value="仿宋">仿宋</option>
                                 </select>
                             </div>
-                            <div class="config-item">
-                                <label>字号</label>
+                            <div class="field">
+                                <span class="field-label">字号</span>
                                 <select id="h3_size">
-                                    <option value="10.5">五号 (10.5pt)</option>
-                                    <option value="12" selected>小四 (12pt)</option>
-                                    <option value="14">四号 (14pt)</option>
-                                    <option value="15">小三 (15pt)</option>
-                                    <option value="16">三号 (16pt)</option>
+                                    <option value="10.5">五号 10.5pt</option>
+                                    <option value="12" selected>小四 12pt</option>
+                                    <option value="14">四号 14pt</option>
+                                    <option value="15">小三 15pt</option>
+                                    <option value="16">三号 16pt</option>
                                 </select>
                             </div>
-                            <div class="config-item">
-                                <label>对齐</label>
+                            <div class="field">
+                                <span class="field-label">对齐</span>
                                 <select id="h3_alignment">
                                     <option value="left">左对齐</option>
                                     <option value="center">居中</option>
                                 </select>
                             </div>
-                            <div class="config-item">
-                                <label>行距</label>
+                            <div class="field">
+                                <span class="field-label">行距</span>
                                 <select id="h3_line_spacing">
-                                    <option value="1.0">1.0 倍</option>
-                                    <option value="1.25">1.25 倍</option>
-                                    <option value="1.5">1.5 倍</option>
-                                    <option value="1.75">1.75 倍</option>
-                                    <option value="2.0">2.0 倍</option>
-                                    <option value="2.5">2.5 倍</option>
-                                    <option value="3.0">3.0 倍</option>
+                                    <option value="1.0">1.0</option>
+                                    <option value="1.25">1.25</option>
+                                    <option value="1.5" selected>1.5</option>
+                                    <option value="1.75">1.75</option>
+                                    <option value="2.0">2.0</option>
+                                    <option value="2.5">2.5</option>
+                                    <option value="3.0">3.0</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="config-section">
-                    <div class="config-section-title" data-target="bodyConfig">
-                        正文格式 <span class="arrow">▼</span>
+                <div class="config-group">
+                    <div class="config-group-header" data-target="bodyConfig">
+                        正文格式 <span class="chevron">▾</span>
                     </div>
-                    <div class="config-grid" id="bodyConfig">
-                        <div class="config-item">
-                            <label>正文字体</label>
-                            <select id="body_font_cn">
-                                <option value="宋体">宋体</option>
-                                <option value="黑体">黑体</option>
-                                <option value="楷体">楷体</option>
-                                <option value="仿宋">仿宋</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>正文字号</label>
-                            <select id="body_size">
-                                <option value="9">小五 (9pt)</option>
-                                <option value="10.5">五号 (10.5pt)</option>
-                                <option value="12" selected>小四 (12pt)</option>
-                                <option value="14">四号 (14pt)</option>
-                                <option value="15">小三 (15pt)</option>
-                                <option value="16">三号 (16pt)</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>行距倍数</label>
-                            <select id="body_line_spacing">
-                                <option value="1.0">1.0 倍</option>
-                                <option value="1.25">1.25 倍</option>
-                                <option value="1.5" selected>1.5 倍</option>
-                                <option value="1.75">1.75 倍</option>
-                                <option value="2.0">2.0 倍</option>
-                                <option value="2.5">2.5 倍</option>
-                                <option value="3.0">3.0 倍</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>英文/数字字体</label>
-                            <select id="en_font">
-                                <option value="Times New Roman">Times New Roman</option>
-                                <option value="Arial">Arial</option>
-                                <option value="Calibri">Calibri</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>正文对齐</label>
-                            <select id="body_alignment">
-                                <option value="justify">两端对齐</option>
-                                <option value="left">左对齐</option>
-                                <option value="center">居中</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="config-section">
-                    <div class="config-section-title" data-target="tableConfig">
-                        表格与图标题 <span class="arrow">▼</span>
-                    </div>
-                    <div class="config-grid" id="tableConfig">
-                        <div class="config-item">
-                            <label>表标题字号</label>
-                            <select id="table_caption_size">
-                                <option value="9">小五 (9pt)</option>
-                                <option value="10.5">五号 (10.5pt)</option>
-                                <option value="12" selected>小四 (12pt)</option>
-                                <option value="14">四号 (14pt)</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>表格内容字号</label>
-                            <select id="table_content_size">
-                                <option value="9">小五 (9pt)</option>
-                                <option value="10.5" selected>五号 (10.5pt)</option>
-                                <option value="12">小四 (12pt)</option>
-                                <option value="14">四号 (14pt)</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>图标题字号</label>
-                            <select id="figure_caption_size">
-                                <option value="9">小五 (9pt)</option>
-                                <option value="10.5">五号 (10.5pt)</option>
-                                <option value="12" selected>小四 (12pt)</option>
-                                <option value="14">四号 (14pt)</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>表标题对齐</label>
-                            <select id="table_caption_alignment">
-                                <option value="center">居中</option>
-                                <option value="left">左对齐</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>图标题对齐</label>
-                            <select id="figure_caption_alignment">
-                                <option value="center">居中</option>
-                                <option value="left">左对齐</option>
-                            </select>
+                    <div class="config-group-body" id="bodyConfig">
+                        <div class="config-grid">
+                            <div class="field">
+                                <span class="field-label">字体</span>
+                                <select id="body_font_cn">
+                                    <option value="宋体">宋体</option>
+                                    <option value="黑体">黑体</option>
+                                    <option value="楷体">楷体</option>
+                                    <option value="仿宋">仿宋</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <span class="field-label">字号</span>
+                                <select id="body_size">
+                                    <option value="9">小五 9pt</option>
+                                    <option value="10.5">五号 10.5pt</option>
+                                    <option value="12" selected>小四 12pt</option>
+                                    <option value="14">四号 14pt</option>
+                                    <option value="15">小三 15pt</option>
+                                    <option value="16">三号 16pt</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <span class="field-label">行距</span>
+                                <select id="body_line_spacing">
+                                    <option value="1.0">1.0</option>
+                                    <option value="1.25">1.25</option>
+                                    <option value="1.5" selected>1.5</option>
+                                    <option value="1.75">1.75</option>
+                                    <option value="2.0">2.0</option>
+                                    <option value="2.5">2.5</option>
+                                    <option value="3.0">3.0</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <span class="field-label">英文字体</span>
+                                <select id="en_font">
+                                    <option value="Times New Roman">Times New Roman</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="Calibri">Calibri</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <span class="field-label">对齐</span>
+                                <select id="body_alignment">
+                                    <option value="justify">两端对齐</option>
+                                    <option value="left">左对齐</option>
+                                    <option value="center">居中</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="config-section">
-                    <div class="config-section-title" data-target="tocConfig">
-                        目录格式 <span class="arrow">▼</span>
+                <div class="config-group">
+                    <div class="config-group-header" data-target="tableConfig">
+                        表格与图标题 <span class="chevron">▾</span>
                     </div>
-                    <div class="config-grid" id="tocConfig">
-                        <div class="config-item">
-                            <label>章标题字体</label>
-                            <select id="toc_chapter_font">
-                                <option value="黑体">黑体</option>
-                                <option value="宋体">宋体</option>
-                            </select>
+                    <div class="config-group-body" id="tableConfig">
+                        <div class="config-grid">
+                            <div class="field">
+                                <span class="field-label">表标题字号</span>
+                                <select id="table_caption_size">
+                                    <option value="9">小五 9pt</option>
+                                    <option value="10.5">五号 10.5pt</option>
+                                    <option value="12" selected>小四 12pt</option>
+                                    <option value="14">四号 14pt</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <span class="field-label">表格内容字号</span>
+                                <select id="table_content_size">
+                                    <option value="9">小五 9pt</option>
+                                    <option value="10.5" selected>五号 10.5pt</option>
+                                    <option value="12">小四 12pt</option>
+                                    <option value="14">四号 14pt</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <span class="field-label">图标题字号</span>
+                                <select id="figure_caption_size">
+                                    <option value="9">小五 9pt</option>
+                                    <option value="10.5">五号 10.5pt</option>
+                                    <option value="12" selected>小四 12pt</option>
+                                    <option value="14">四号 14pt</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <span class="field-label">表标题对齐</span>
+                                <select id="table_caption_alignment">
+                                    <option value="center">居中</option>
+                                    <option value="left">左对齐</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <span class="field-label">图标题对齐</span>
+                                <select id="figure_caption_alignment">
+                                    <option value="center">居中</option>
+                                    <option value="left">左对齐</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="config-item">
-                            <label>章标题字号</label>
-                            <select id="toc_chapter_size">
-                                <option value="10.5">五号 (10.5pt)</option>
-                                <option value="12" selected>小四 (12pt)</option>
-                                <option value="14">四号 (14pt)</option>
-                                <option value="15">小三 (15pt)</option>
-                                <option value="16">三号 (16pt)</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>节标题字体</label>
-                            <select id="toc_section_font">
-                                <option value="宋体">宋体</option>
-                                <option value="黑体">黑体</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>节标题字号</label>
-                            <select id="toc_section_size">
-                                <option value="10.5">五号 (10.5pt)</option>
-                                <option value="12" selected>小四 (12pt)</option>
-                                <option value="14">四号 (14pt)</option>
-                                <option value="15">小三 (15pt)</option>
-                                <option value="16">三号 (16pt)</option>
-                            </select>
-                        </div>
-                        <div class="config-item">
-                            <label>目录行距</label>
-                            <select id="toc_line_spacing">
-                                <option value="1.0">1.0 倍</option>
-                                <option value="1.25" selected>1.25 倍</option>
-                                <option value="1.5">1.5 倍</option>
-                                <option value="1.75">1.75 倍</option>
-                                <option value="2.0">2.0 倍</option>
-                            </select>
+                    </div>
+                </div>
+
+                <div class="config-group">
+                    <div class="config-group-header" data-target="tocConfig">
+                        目录格式 <span class="chevron">▾</span>
+                    </div>
+                    <div class="config-group-body" id="tocConfig">
+                        <div class="config-grid">
+                            <div class="field">
+                                <span class="field-label">章标题字体</span>
+                                <select id="toc_chapter_font">
+                                    <option value="黑体">黑体</option>
+                                    <option value="宋体">宋体</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <span class="field-label">章标题字号</span>
+                                <select id="toc_chapter_size">
+                                    <option value="10.5">五号 10.5pt</option>
+                                    <option value="12" selected>小四 12pt</option>
+                                    <option value="14">四号 14pt</option>
+                                    <option value="15">小三 15pt</option>
+                                    <option value="16">三号 16pt</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <span class="field-label">节标题字体</span>
+                                <select id="toc_section_font">
+                                    <option value="宋体">宋体</option>
+                                    <option value="黑体">黑体</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <span class="field-label">节标题字号</span>
+                                <select id="toc_section_size">
+                                    <option value="10.5">五号 10.5pt</option>
+                                    <option value="12" selected>小四 12pt</option>
+                                    <option value="14">四号 14pt</option>
+                                    <option value="15">小三 15pt</option>
+                                    <option value="16">三号 16pt</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <span class="field-label">目录行距</span>
+                                <select id="toc_line_spacing">
+                                    <option value="1.0">1.0</option>
+                                    <option value="1.25" selected>1.25</option>
+                                    <option value="1.5">1.5</option>
+                                    <option value="1.75">1.75</option>
+                                    <option value="2.0">2.0</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="card">
-            <div class="card-title">
-                <span class="step">3</span>
-                开始处理
+        <section class="section">
+            <div class="section-label">
+                <span class="section-num">3</span>
+                <span class="section-title">开始处理</span>
             </div>
-            <div class="btn-row">
+            <div class="actions">
                 <button class="btn btn-primary" id="formatBtn" disabled>
                     <span id="formatBtnText">确认修改</span>
                 </button>
-                <button class="btn btn-secondary" id="resetBtn">重置设置</button>
+                <button class="btn btn-ghost" id="resetBtn">重置设置</button>
             </div>
 
-            <div class="progress-area" id="progressArea">
-                <div class="progress-bar-bg">
-                    <div class="progress-bar" id="progressBar"></div>
+            <div class="progress-wrap" id="progressArea">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressBar"></div>
                 </div>
-                <div class="progress-text" id="progressText">正在上传文件...</div>
+                <div class="progress-label" id="progressText">正在上传文件...</div>
             </div>
 
-            <div class="result-area" id="resultArea"></div>
+            <div class="result-wrap" id="resultArea"></div>
+        </section>
+
+        <div class="footer-note">
+            DocFlow · Word 文档格式自动化处理工具 · <a href="https://github.com/Sudentking/Paper_Format_Organization" target="_blank">GitHub</a>
         </div>
-    </div>
+    </main>
 
-    <div id="previewPage" style="display:none;">
-        <div class="preview-header">
-            <div class="preview-header-left">
-                <button class="btn btn-secondary preview-back-btn" id="previewBackBtn">← 返回修改</button>
-            </div>
-            <div class="preview-header-title">文档预览</div>
-            <div class="preview-header-right">
-                <a class="btn btn-primary preview-download-btn" id="previewDownloadBtn" href="#" download>
-                    📥 确认下载文档
-                </a>
-            </div>
+    <div class="preview-page" id="previewPage">
+        <div class="preview-bar">
+            <button class="btn btn-ghost" id="previewBackBtn" style="font-size:13px;padding:6px 14px;">← 返回修改</button>
+            <span class="preview-bar-title">文档预览</span>
+            <a class="btn btn-success" id="previewDownloadBtn" href="#" download style="font-size:13px;padding:6px 14px;text-decoration:none;">
+                确认下载
+            </a>
         </div>
         <div class="preview-hint">
-            ⚠️ 预览为 HTML 渲染效果，可能与最终 Word 文档存在细微差异（字体、分页、页眉页脚等）。确认无误后请点击右上角下载。
+            预览为 HTML 渲染效果，可能与最终 Word 文档存在细微差异。确认无误后请下载。
         </div>
-        <div class="preview-frame-wrapper">
+        <div class="preview-canvas">
             <iframe id="previewFrame" class="preview-frame" src="about:blank"></iframe>
         </div>
-        <div class="preview-footer">
-            <button class="btn btn-secondary" id="previewBackBtnBottom">← 返回修改设置</button>
-            <a class="btn btn-primary" id="previewDownloadBtnBottom" href="#" download>
-                📥 确认下载格式化文档
-            </a>
+        <div class="preview-bottom">
+            <button class="btn btn-ghost" id="previewBackBtnBottom">← 返回修改设置</button>
+            <a class="btn btn-success" id="previewDownloadBtnBottom" href="#" download>确认下载格式化文档</a>
         </div>
     </div>
 
@@ -905,21 +1038,7 @@
             }
         };
 
-        const uploadZone = document.getElementById('uploadZone');
-        const fileInput = document.getElementById('fileInput');
-        const fileInfo = document.getElementById('fileInfo');
-        const fileName = document.getElementById('fileName');
-        const fileSize = document.getElementById('fileSize');
-        const removeBtn = document.getElementById('removeBtn');
-        const formatBtn = document.getElementById('formatBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const formatBtnText = document.getElementById('formatBtnText');
-        const progressArea = document.getElementById('progressArea');
-        const progressBar = document.getElementById('progressBar');
-        const progressText = document.getElementById('progressText');
-        const resultArea = document.getElementById('resultArea');
-        const advancedToggle = document.getElementById('advancedToggle');
-        const advancedConfig = document.getElementById('advancedConfig');
+        const $ = id => document.getElementById(id);
 
         function formatFileSize(bytes) {
             if (bytes < 1024) return bytes + ' B';
@@ -933,156 +1052,119 @@
                 return;
             }
             state.file = file;
-            fileName.textContent = file.name;
-            fileSize.textContent = formatFileSize(file.size);
-            fileInfo.classList.add('show');
-            uploadZone.style.display = 'none';
-            formatBtn.disabled = false;
-            resultArea.classList.remove('show');
+            $('fileName').textContent = file.name;
+            $('fileSize').textContent = formatFileSize(file.size);
+            $('fileInfo').classList.add('show');
+            $('uploadZone').style.display = 'none';
+            $('formatBtn').disabled = false;
+            $('resultArea').classList.remove('show');
         }
 
         function clearFile() {
             state.file = null;
             state.sessionId = null;
             state.filename = null;
-            fileInput.value = '';
-            fileInfo.classList.remove('show');
-            uploadZone.style.display = '';
-            formatBtn.disabled = true;
-            resultArea.classList.remove('show');
+            $('fileInput').value = '';
+            $('fileInfo').classList.remove('show');
+            $('uploadZone').style.display = '';
+            $('formatBtn').disabled = true;
+            $('resultArea').classList.remove('show');
         }
 
-        uploadZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadZone.classList.add('dragover');
-        });
-
-        uploadZone.addEventListener('dragleave', () => {
-            uploadZone.classList.remove('dragover');
-        });
-
-        uploadZone.addEventListener('drop', (e) => {
+        const uploadZone = $('uploadZone');
+        uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+        uploadZone.addEventListener('drop', e => {
             e.preventDefault();
             uploadZone.classList.remove('dragover');
-            const file = e.dataTransfer.files[0];
-            if (file) setFile(file);
+            if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
         });
+        $('fileInput').addEventListener('change', e => { if (e.target.files[0]) setFile(e.target.files[0]); });
+        $('removeBtn').addEventListener('click', clearFile);
 
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files[0]) setFile(e.target.files[0]);
-        });
-
-        removeBtn.addEventListener('click', clearFile);
-
-        advancedToggle.addEventListener('click', () => {
-            const isHidden = advancedConfig.style.display === 'none';
-            advancedConfig.style.display = isHidden ? '' : 'none';
-            advancedToggle.textContent = isHidden ? '收起高级设置 ▲' : '展开高级设置 ▼';
-        });
-
-        document.querySelectorAll('.config-section-title').forEach(title => {
-            title.addEventListener('click', () => {
-                const target = document.getElementById(title.dataset.target);
-                const arrow = title.querySelector('.arrow');
-                const isCollapsed = target.classList.toggle('collapsed');
-                arrow.classList.toggle('collapsed', isCollapsed);
+        document.querySelectorAll('.config-group-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const target = document.getElementById(header.dataset.target);
+                const chevron = header.querySelector('.chevron');
+                const collapsed = target.classList.toggle('collapsed');
+                chevron.classList.toggle('collapsed', collapsed);
             });
         });
 
-        document.querySelectorAll('.preset-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const preset = presets[btn.dataset.preset];
+        document.querySelectorAll('.preset-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                const preset = presets[chip.dataset.preset];
                 Object.keys(preset).forEach(key => {
-                    const el = document.getElementById(key);
+                    const el = $(key);
                     if (el) el.value = preset[key];
                 });
             });
         });
 
-        resetBtn.addEventListener('click', () => {
-            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        $('resetBtn').addEventListener('click', () => {
+            document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
             document.querySelector('[data-preset="default"]').classList.add('active');
             Object.keys(presets.default).forEach(key => {
-                const el = document.getElementById(key);
+                const el = $(key);
                 if (el) el.value = presets.default[key] || el.options[0].value;
             });
         });
 
         function buildConfigJSON() {
-            const enFont = document.getElementById('en_font').value;
-            const tocChapterFont = document.getElementById('toc_chapter_font').value;
-            const tocChapterSize = parseFloat(document.getElementById('toc_chapter_size').value);
-            const tocSectionFont = document.getElementById('toc_section_font').value;
-            const tocSectionSize = parseFloat(document.getElementById('toc_section_size').value);
-            const tocLineSpacing = parseFloat(document.getElementById('toc_line_spacing').value);
+            const enFont = $('en_font').value;
+            const tocChapterFont = $('toc_chapter_font').value;
+            const tocChapterSize = parseFloat($('toc_chapter_size').value);
+            const tocSectionFont = $('toc_section_font').value;
+            const tocSectionSize = parseFloat($('toc_section_size').value);
+            const tocLineSpacing = parseFloat($('toc_line_spacing').value);
 
-            const config = {
-                global: {
-                    english_number_font: enFont
-                },
+            return {
+                global: { english_number_font: enFont },
                 headings: {
                     level1: {
-                        font_name_cn: document.getElementById('h1_font_cn').value,
-                        font_name_en: enFont,
-                        font_size: parseFloat(document.getElementById('h1_size').value),
-                        bold: true,
-                        alignment: document.getElementById('h1_alignment').value,
-                        line_spacing: parseFloat(document.getElementById('h1_line_spacing').value),
-                        space_before: 0,
-                        space_after: 0
+                        font_name_cn: $('h1_font_cn').value, font_name_en: enFont,
+                        font_size: parseFloat($('h1_size').value), bold: true,
+                        alignment: $('h1_alignment').value,
+                        line_spacing: parseFloat($('h1_line_spacing').value),
+                        space_before: 0, space_after: 0
                     },
                     level2: {
-                        font_name_cn: document.getElementById('h2_font_cn').value,
-                        font_name_en: enFont,
-                        font_size: parseFloat(document.getElementById('h2_size').value),
-                        bold: true,
-                        alignment: document.getElementById('h2_alignment').value,
-                        line_spacing: parseFloat(document.getElementById('h2_line_spacing').value),
-                        space_before: 0,
-                        space_after: 0
+                        font_name_cn: $('h2_font_cn').value, font_name_en: enFont,
+                        font_size: parseFloat($('h2_size').value), bold: true,
+                        alignment: $('h2_alignment').value,
+                        line_spacing: parseFloat($('h2_line_spacing').value),
+                        space_before: 0, space_after: 0
                     },
                     level3: {
-                        font_name_cn: document.getElementById('h3_font_cn').value,
-                        font_name_en: enFont,
-                        font_size: parseFloat(document.getElementById('h3_size').value),
-                        bold: true,
-                        alignment: document.getElementById('h3_alignment').value,
-                        line_spacing: parseFloat(document.getElementById('h3_line_spacing').value),
-                        space_before: 0,
-                        space_after: 0
+                        font_name_cn: $('h3_font_cn').value, font_name_en: enFont,
+                        font_size: parseFloat($('h3_size').value), bold: true,
+                        alignment: $('h3_alignment').value,
+                        line_spacing: parseFloat($('h3_line_spacing').value),
+                        space_before: 0, space_after: 0
                     }
                 },
                 paragraph: {
-                    font_name_cn: document.getElementById('body_font_cn').value,
-                    font_name_en: enFont,
-                    font_size: parseFloat(document.getElementById('body_size').value),
-                    bold: false,
-                    line_spacing: parseFloat(document.getElementById('body_line_spacing').value),
-                    alignment: document.getElementById('body_alignment').value,
-                    first_line_indent: 0,
-                    char_spacing: 0,
-                    space_before: 0,
-                    space_after: 0
+                    font_name_cn: $('body_font_cn').value, font_name_en: enFont,
+                    font_size: parseFloat($('body_size').value), bold: false,
+                    line_spacing: parseFloat($('body_line_spacing').value),
+                    alignment: $('body_alignment').value,
+                    first_line_indent: 0, char_spacing: 0,
+                    space_before: 0, space_after: 0
                 },
                 table: {
                     caption: {
-                        font_name_cn: '宋体',
-                        font_name_en: enFont,
-                        font_size: parseFloat(document.getElementById('table_caption_size').value),
+                        font_name_cn: '宋体', font_name_en: enFont,
+                        font_size: parseFloat($('table_caption_size').value),
                         bold: true,
-                        alignment: document.getElementById('table_caption_alignment').value,
-                        space_before: 6,
-                        space_after: 6
+                        alignment: $('table_caption_alignment').value,
+                        space_before: 6, space_after: 6
                     },
                     content: {
-                        font_name_cn: '宋体',
-                        font_name_en: enFont,
-                        font_size: parseFloat(document.getElementById('table_content_size').value),
-                        bold: false,
-                        alignment: 'center',
-                        vertical_alignment: 'center'
+                        font_name_cn: '宋体', font_name_en: enFont,
+                        font_size: parseFloat($('table_content_size').value),
+                        bold: false, alignment: 'center', vertical_alignment: 'center'
                     },
                     style: {
                         border_style: 'three_line',
@@ -1093,134 +1175,82 @@
                 },
                 figure: {
                     caption: {
-                        font_name_cn: '宋体',
-                        font_name_en: enFont,
-                        font_size: parseFloat(document.getElementById('figure_caption_size').value),
+                        font_name_cn: '宋体', font_name_en: enFont,
+                        font_size: parseFloat($('figure_caption_size').value),
                         bold: true,
-                        alignment: document.getElementById('figure_caption_alignment').value,
-                        space_before: 6,
-                        space_after: 6
+                        alignment: $('figure_caption_alignment').value,
+                        space_before: 6, space_after: 6
                     }
                 },
                 reference: {
                     title: {
-                        font_name_cn: '黑体',
-                        font_name_en: enFont,
-                        font_size: 10.5,
-                        bold: true,
-                        alignment: 'center',
-                        space_before: 12,
-                        space_after: 6
+                        font_name_cn: '黑体', font_name_en: enFont,
+                        font_size: 10.5, bold: true, alignment: 'center',
+                        space_before: 12, space_after: 6
                     },
                     content: {
-                        font_name_cn: '宋体',
-                        font_name_en: enFont,
-                        font_size: 10.5,
-                        bold: false,
-                        alignment: 'left',
+                        font_name_cn: '宋体', font_name_en: enFont,
+                        font_size: 10.5, bold: false, alignment: 'left',
                         line_spacing: 1.5
                     }
                 },
                 toc: {
                     title: {
-                        font_name_cn: '黑体',
-                        font_name_en: enFont,
-                        font_size: 16,
-                        bold: true,
-                        alignment: 'center',
-                        space_before: 12,
-                        space_after: 12
+                        font_name_cn: '黑体', font_name_en: enFont,
+                        font_size: 16, bold: true, alignment: 'center',
+                        space_before: 12, space_after: 12
                     },
                     chapter: {
-                        font_name_cn: tocChapterFont,
-                        font_name_en: enFont,
-                        font_size: tocChapterSize,
-                        bold: true,
-                        indent: 0
+                        font_name_cn: tocChapterFont, font_name_en: enFont,
+                        font_size: tocChapterSize, bold: true, indent: 0
                     },
                     section: {
-                        font_name_cn: tocSectionFont,
-                        font_name_en: enFont,
-                        font_size: tocSectionSize,
-                        bold: false,
-                        indent: 2
+                        font_name_cn: tocSectionFont, font_name_en: enFont,
+                        font_size: tocSectionSize, bold: false, indent: 2
                     },
                     subsection: {
-                        font_name_cn: tocSectionFont,
-                        font_name_en: enFont,
-                        font_size: tocSectionSize,
-                        bold: false,
-                        indent: 4
+                        font_name_cn: tocSectionFont, font_name_en: enFont,
+                        font_size: tocSectionSize, bold: false, indent: 4
                     },
                     line_spacing: tocLineSpacing,
                     special_entries: ['摘要', 'Abstract', '结论', '参考文献', '致谢']
                 }
             };
-            return config;
         }
 
         function setProgress(percent, text) {
-            progressArea.classList.add('show');
-            progressBar.style.width = percent + '%';
-            progressBar.classList.toggle('indeterminate', percent === 0);
-            progressText.textContent = text;
+            $('progressArea').classList.add('show');
+            $('progressBar').style.width = percent + '%';
+            $('progressBar').classList.toggle('indeterminate', percent === 0);
+            $('progressText').textContent = text;
         }
 
-        function showResult(success, message, downloadUrl) {
-            progressArea.classList.remove('show');
-            resultArea.classList.add('show');
-
-            if (success) {
-                resultArea.innerHTML = `
-                    <div class="result-success">
-                        <div class="result-title">✅ 处理完成</div>
-                        <div class="result-detail">${message}</div>
-                    </div>
-                `;
-            } else {
-                resultArea.innerHTML = `
-                    <div class="result-error">
-                        <div class="result-title">❌ 处理失败</div>
-                        <div class="result-detail">${message}</div>
-                    </div>
-                `;
-            }
+        function showResult(success, message) {
+            $('progressArea').classList.remove('show');
+            $('resultArea').classList.add('show');
+            const cls = success ? 'success' : 'error';
+            const label = success ? '处理完成' : '处理失败';
+            $('resultArea').innerHTML = `<div class="result-box ${cls}"><strong>${label}</strong>${message}</div>`;
         }
 
         function showPreview(sessionId, outputFilename) {
-            const mainContent = document.getElementById('mainContent');
-            const header = document.querySelector('.header');
-            const previewPage = document.getElementById('previewPage');
-            const previewFrame = document.getElementById('previewFrame');
-            const previewDownloadBtn = document.getElementById('previewDownloadBtn');
-            const previewDownloadBtnBottom = document.getElementById('previewDownloadBtnBottom');
-
             const downloadUrl = `/api/download/${sessionId}/${outputFilename}`;
-            previewDownloadBtn.href = downloadUrl;
-            previewDownloadBtnBottom.href = downloadUrl;
+            $('previewDownloadBtn').href = downloadUrl;
+            $('previewDownloadBtnBottom').href = downloadUrl;
 
-            header.style.display = 'none';
-            mainContent.style.display = 'none';
-            previewPage.style.display = '';
-
-            const previewUrl = `/api/preview/${sessionId}/${outputFilename}`;
-            previewFrame.src = previewUrl;
+            $('appHeader').style.display = 'none';
+            $('mainContent').style.display = 'none';
+            $('previewPage').style.display = '';
+            $('previewFrame').src = `/api/preview/${sessionId}/${outputFilename}`;
         }
 
         function hidePreview() {
-            const mainContent = document.getElementById('mainContent');
-            const header = document.querySelector('.header');
-            const previewPage = document.getElementById('previewPage');
-            const previewFrame = document.getElementById('previewFrame');
-
-            previewPage.style.display = 'none';
-            header.style.display = '';
-            mainContent.style.display = '';
-            previewFrame.src = 'about:blank';
-
-            progressArea.classList.remove('show');
-            resultArea.classList.remove('show');
-
+            $('previewPage').style.display = 'none';
+            $('appHeader').style.display = '';
+            $('mainContent').style.display = '';
+            $('previewFrame').src = 'about:blank';
+            $('progressArea').classList.remove('show');
+            $('resultArea').classList.remove('show');
             state.outputFilename = null;
         }
 
@@ -1228,10 +1258,7 @@
             const formData = new FormData();
             formData.append('file', file);
             const resp = await fetch('/api/upload', { method: 'POST', body: formData });
-            if (!resp.ok) {
-                const err = await resp.json();
-                throw new Error(err.detail || '上传失败');
-            }
+            if (!resp.ok) { const err = await resp.json(); throw new Error(err.detail || '上传失败'); }
             return await resp.json();
         }
 
@@ -1244,12 +1271,12 @@
             return await resp.json();
         }
 
-        formatBtn.addEventListener('click', async () => {
+        $('formatBtn').addEventListener('click', async () => {
             if (!state.file || state.isProcessing) return;
             state.isProcessing = true;
-            formatBtn.disabled = true;
-            formatBtnText.innerHTML = '<span class="spinner"></span> 处理中...';
-            resultArea.classList.remove('show');
+            $('formatBtn').disabled = true;
+            $('formatBtnText').innerHTML = '<span class="spinner"></span> 处理中';
+            $('resultArea').classList.remove('show');
 
             try {
                 setProgress(0, '正在上传文件...');
@@ -1257,17 +1284,14 @@
                 state.sessionId = uploadResult.session_id;
                 state.filename = uploadResult.filename;
 
-                setProgress(40, '正在格式化文档，请稍候...');
-
+                setProgress(40, '正在格式化文档...');
                 const configJSON = JSON.stringify(buildConfigJSON());
                 const formatResult = await formatDocument(state.sessionId, state.filename, configJSON);
 
                 if (formatResult.success) {
                     state.outputFilename = formatResult.output_filename;
-                    setProgress(100, '处理完成！正在加载预览...');
-                    setTimeout(() => {
-                        showPreview(formatResult.session_id, formatResult.output_filename);
-                    }, 300);
+                    setProgress(100, '正在加载预览...');
+                    setTimeout(() => showPreview(formatResult.session_id, formatResult.output_filename), 300);
                 } else {
                     showResult(false, formatResult.message || '格式化失败');
                 }
@@ -1275,16 +1299,16 @@
                 showResult(false, err.message || '处理过程中出现错误');
             } finally {
                 state.isProcessing = false;
-                formatBtn.disabled = false;
-                formatBtnText.textContent = '确认修改';
+                $('formatBtn').disabled = false;
+                $('formatBtnText').textContent = '确认修改';
             }
         });
 
-        document.getElementById('previewBackBtn').addEventListener('click', hidePreview);
-        document.getElementById('previewBackBtnBottom').addEventListener('click', hidePreview);
+        $('previewBackBtn').addEventListener('click', hidePreview);
+        $('previewBackBtnBottom').addEventListener('click', hidePreview);
 
-        document.addEventListener('dragover', (e) => e.preventDefault());
-        document.addEventListener('drop', (e) => e.preventDefault());
+        document.addEventListener('dragover', e => e.preventDefault());
+        document.addEventListener('drop', e => e.preventDefault());
     </script>
 </body>
 </html>
